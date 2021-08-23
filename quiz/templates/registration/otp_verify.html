@@ -1,0 +1,43 @@
+<html>
+
+
+<style>
+input[type=text]{
+    
+    font-size: large;
+    text-align: center;
+    
+}
+
+#border{
+    padding: 3%;
+    margin: auto;
+    width: 30%;
+    border: ridge;
+    text-align: center;
+    background:  #FAF8F8;
+    box-shadow: 0 0 4px #ccc;
+    border: solid 1px #ccc
+    
+}
+</style>
+
+<body>
+<form method="POST">
+    
+
+{% csrf_token %}
+<div id="border">
+    <h3>Please Enter 6 digit verification code we sent via Email</h3>
+    <div>
+        <input type="text" name="otp" maxLength="6" size="6" min="0" max="9" pattern="[0-9]{6}" onkeypress='return event.charCode >= 48 && event.charCode <= 57' value=""/>
+    </div>
+    <button type="submit" class="btn btn-primary btn-embossed" style="margin: 2%;">Verify</button>
+</div>
+
+</form>
+</body>
+
+
+
+</html>

@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<title>Quiz App - Test your knowledge</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<style>
+body,h1 {font-family: "Raleway", sans-serif}
+body, html {height: 100%}
+.bgimg {
+  background-image: url("{% static 'landing.jpg' %}");
+  min-height: 100%;
+  background-position: center;
+  background-size: cover;
+}
+</style>
+<body>
+
+<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
+  <div class="w3-display-topleft w3-padding-large w3-xlarge">
+  </div>
+  <div class="w3-display-middle">
+    <h1 class="w3-jumbo w3-animate-top">Welcome To My Quiz</h1>
+    
+    <hr class="w3-border-grey" style="margin:auto;width:40%">
+    <a href="{% url 'registration:register' %}"><button type="button" class="w3-large w3-center btn btn-default" style="margin-left:96.337px">Sign Up</button></a>
+    <a href="{% url 'registration:login' %}"><button type="button" class="w3-large w3-center btn btn-default" style="float:right;margin-right:117px">Login</button></a>
+  </div>
+  
+</div>
+
+</body>
+</html>

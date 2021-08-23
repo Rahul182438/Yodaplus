@@ -1,0 +1,35 @@
+{% load static %}
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" >
+</head>
+
+<body>
+
+  <div class="banner-text">
+    <ul>
+      <li>Home</li>
+      <li>Report</li>
+      <li>Logout</li>
+    </ul>
+    
+     {% block myblock %}{% endblock %}
+    
+    
+  </div>
+
+  <div class="animation-area">
+    <ul class="box-area">
+      <li></li>
+      <li></li>
+     
+    </ul>
+  </div>
+  
+
+</body>
+
+</html>
