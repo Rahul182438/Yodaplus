@@ -32,7 +32,6 @@ class Registration(View):
         
         if form.is_valid():
 
-
             form.save()
             username = form.cleaned_data.get('username')
             email = form.cleaned_data.get('email')
@@ -45,23 +44,16 @@ class Registration(View):
             VerificationStatus.objects.create(user=userobj,email_otp=user_otp)
             
             email_content = render_to_string('emails/verification_email.html', locals())
-            text_content = strip_tags(email_content)
 
             email = EmailMultiAlternatives(
                 "Quiz App Verification", 
                 email_content, 
                 settings.EMAIL_HOST_USER,
-                ['rahulkallil3@gmail.com'],
+                [str(userobj.email)],
             )
 
             email.attach_alternative(email_content, "text/html")
             email.send()
-            # send_mail("Quiz App Verification", 
-            #     email_content, 
-                
-            #     ['rahulkallil3@gmail.com'], 
-            #     fail_silently = False
-            #     )
 
             return redirect('registration:login')
         return render(request, 'registration/signup.html', self.context)
@@ -72,39 +64,38 @@ class Login(View):
 
     context = {'form':form}
 
+
     def get(self, request):
         return render(request, 'registration/login.html', self.context)
 
     def post(self,request):
         username = request.POST.get('username')
         password = request.POST.get('password1')
-        print(username)
-        print(password)
-        otp = request.POST.get('otp')
-        # if otp:
-            
+
         user = authenticate(request, username=username, password=password)
-        print(user)
+
         try:
             verify_obj = VerificationStatus.objects.get(user=user)
         except:
             verify_obj = None
-        print(verify_obj)
+
         if verify_obj and verify_obj.email_verify == False:
             return redirect('registration:otp_verify',user_id=user.id)
-            # verify_obj.email_verify = True
-            # verify_obj.save()
-            # if user is not None:
-            # login(request, user)         
-            
+
         elif user is not None and verify_obj:
             login(request, user)
             return redirect('dashboard:user_dashboard')
         else:
-            messages.info(request, 'Username,password or OTP is incorrect')
+            messages.info(request, 'Username or password is incorrect')
+            return redirect('dashboard:user_dashboard')
             
         return render(request,'registration/login.html',locals())
     
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('registration:login')
 
 class Verify(View):
     form = VerifyForm()
@@ -115,25 +106,28 @@ class Verify(View):
         return render(request, 'registration/otp_verify.html', self.context)
 
     def post(self,request,user_id):
-        otp = int(request.POST.get('otp'))
-        
+       
+        otp = request.POST.get('otp',None)
+        print(otp)
         userobj = User.objects.get(id=user_id)
-        print(userobj)
+        
         if userobj:
             try:
                 verify_obj = VerificationStatus.objects.get(user=userobj)
             except:
                 verify_obj = None
 
-        if otp and verify_obj and verify_obj.email_otp == otp:
+        if otp and verify_obj and verify_obj.email_otp == int(otp):
             verify_obj.email_verify = True
             verify_obj.save()
-            user = authenticate(request, username=userobj.username, password=userobj.password)
-            login(request, user)
+            # user = authenticate(request, username=userobj.username, password=userobj.password)
+
             
-            return redirect('dashboard:user_dashboard')
+            # return redirect('dashboard:user_dashboard')
+            return redirect('registration:login')
         else:
             messages.info(request, 'OTP is incorrect')
+            return redirect('registration:otp_verify',user_id=user_id)
             
         return render(request,'registration/otp_verify.html',locals())
     

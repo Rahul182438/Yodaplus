@@ -33,6 +33,10 @@ input[type=text]{
         <input type="text" name="otp" maxLength="6" size="6" min="0" max="9" pattern="[0-9]{6}" onkeypress='return event.charCode >= 48 && event.charCode <= 57' value=""/>
     </div>
     <button type="submit" class="btn btn-primary btn-embossed" style="margin: 2%;">Verify</button>
+    {% for message in  messages %}
+    <p>{{message}}</p>
+    {% endfor %}
+
 </div>
 
 </form>

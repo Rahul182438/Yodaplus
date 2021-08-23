@@ -20,7 +20,7 @@ body{
 .banner-text ul li{
     display: inline-block;
     padding: 40px 15px;
-    text-transform: uppercase;
+    
     color: #fff;
     font-size: 20px;
 }
