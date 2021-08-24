@@ -88,17 +88,15 @@ button:hover {
     {% csrf_token %}
   <div class="container">
     <h1>Login</h1>
-    <!-- <p>Please fill</p> -->
     <hr>
 
     <label for="name"><b>{{form.username.label}}</b></label>
     {{form.username}}
 
-    <label for="psw"><b>{{form.password1.label}}</b></label>
-    {{form.password1}}
+    <label for="psw"><b>{{form.password.label}}</b></label>
+    {{form.password}}
 
-    <!-- <label><b>OTP</b></label>
-    <input type="text" name="otp" value="" placeholder="Enter the OTP you have received in your mail address" onkeypress='return event.charCode >= 48 && event.charCode <= 57'> -->
+    {{form.errors}}
 
     {% for message in  messages %}
     <p>{{message}}</p>

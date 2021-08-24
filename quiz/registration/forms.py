@@ -13,3 +13,4 @@ class VerifyForm(forms.Form):
     class Meta:
         model = VerificationStatus
         fields = ['user','email_verify','email_otp']
+
