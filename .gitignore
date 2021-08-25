@@ -1,0 +1,7 @@
+.vscode/
+myenv/
+db.sqlite3
+quiz/dashboard/migrations/
+quiz/dashboard/api/
+__pycache__/
+quiz/dashboard/__pycache__/
