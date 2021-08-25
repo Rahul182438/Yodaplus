@@ -7,6 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 # Create your models here.
 
 
+
+
 class QuestionType(models.Model):
     quiz_choices = (
         ('MCQ','Multiple Choice Questions'),
@@ -16,6 +18,7 @@ class QuestionType(models.Model):
 
     def __str__(self):
         return self.type_name
+
 
 
 class SubjectInfo(models.Model):
@@ -69,11 +72,10 @@ class UserProgress(models.Model):
     question = models.ForeignKey(QuestionInfo,on_delete=models.CASCADE)
     mcq_answer = models.ForeignKey(AnswerInfo, on_delete=models.CASCADE, null=True, blank=True)
     one_word_answer = models.CharField(max_length=50, null=True, blank=True)
-
+    
 
     def save(self, *args, **kwargs):
-        print(self.right_choice)
-        print(self.wrong_choice)
+
         if self.right_choice or self.wrong_choice:
             self.is_complete = True
         else:

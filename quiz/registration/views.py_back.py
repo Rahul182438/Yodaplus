@@ -1,20 +1,23 @@
-import string
-import random
-
+from django.shortcuts import render, redirect
+from django.views import View
+from django.views.generic.base import TemplateView
+from .forms import SignupForm, VerifyForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm
 from django.core.mail import EmailMultiAlternatives
-from django.conf import settings
-from django.http.response import HttpResponseRedirect
-from django.shortcuts import render, redirect
-from django.views.generic.base import TemplateView
-from django.views.generic.edit import FormView
-from django.template.loader import render_to_string
-
 from .models import VerificationStatus
-from .forms import SignupForm, VerifyForm
+from django.contrib.auth.models import User
+import math, random
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.views.generic.edit import FormView
+from django.contrib.auth.forms import AuthenticationForm
+from django.http.response import HttpResponseRedirect
+import string
+# Create your views here.
+
+
+
 
 class IndexView(TemplateView):
 
@@ -151,3 +154,77 @@ def generate_otp(size):
     """
     generate_otp = ''.join([random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for n in range (size)])
     return generate_otp
+# class Registration(View):
+#     form = SignupForm()
+    
+#     context = {'form':form}
+    
+#     def get(self, request):
+#         return render(request, 'registration/signup.html', self.context)
+    
+#     def post(self, request):
+#         form = SignupForm(request.POST)
+        
+#         if form.is_valid():
+
+#             form.save()
+#             username = form.cleaned_data.get('username')
+#             email = form.cleaned_data.get('email')
+#             messages.success(request, 'Account created successfully')
+            
+#             userobj = User.objects.get(username=username,email=email)
+
+#             user_otp = random.randint(100000,999999)
+
+#             VerificationStatus.objects.create(user=userobj,email_otp=user_otp)
+            
+#             email_content = render_to_string('emails/verification_email.html', locals())
+
+#             email = EmailMultiAlternatives(
+#                 "Quiz App Verification", 
+#                 email_content, 
+#                 settings.EMAIL_HOST_USER,
+#                 [str(userobj.email)],
+#             )
+
+#             email.attach_alternative(email_content, "text/html")
+#             email.send()
+
+#             return redirect('registration:login')
+#         return render(request, 'registration/signup.html', self.context)
+    
+
+
+# class Login(View):
+
+#     form = SignupForm()
+
+#     context = {'form':form}
+
+
+#     def get(self, request):
+#         return render(request, 'registration/login.html', self.context)
+
+#     def post(self,request):
+#         username = request.POST.get('username')
+#         password = request.POST.get('password1')
+
+#         user = authenticate(request, username=username, password=password)
+
+#         try:
+#             verify_obj = VerificationStatus.objects.get(user=user)
+#         except:
+#             verify_obj = None
+
+#         if verify_obj and verify_obj.email_verify == False:
+#             return redirect('registration:otp_verify',user_id=user.id)
+
+#         elif user is not None and verify_obj:
+#             login(request, user)
+#             return redirect('dashboard:user_dashboard')
+#         else:
+#             messages.info(request, 'Username or password is incorrect')
+#             return redirect('dashboard:user_dashboard')
+            
+#         return render(request,'registration/login.html',locals())
+    v

@@ -1,6 +1,6 @@
 .vscode/
 myenv/
-db.sqlite3
+quiz/db.sqlite3
 quiz/dashboard/migrations/
 quiz/dashboard/api/
 __pycache__/

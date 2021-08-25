@@ -30,7 +30,7 @@ input[type=text]{
 <div id="border">
     <h3>Please Enter 6 digit verification code we sent via Email</h3>
     <div>
-        <input type="text" name="otp" maxLength="6" size="6" min="0" max="9" pattern="[0-9]{6}" onkeypress='return event.charCode >= 48 && event.charCode <= 57' value=""/>
+        <input type="text" name="otp" maxLength="6" size="6" min="0" max="9"  value=""/>
     </div>
     <button type="submit" class="btn btn-primary btn-embossed" style="margin: 2%;">Verify</button>
     {% for message in  messages %}

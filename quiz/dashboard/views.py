@@ -12,8 +12,6 @@ from .models import *
 class Dashboard(View):
 
 
-    
-
 
     def get(self,request):
 

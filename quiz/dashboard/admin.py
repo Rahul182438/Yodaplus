@@ -7,27 +7,6 @@ from .models import QuestionType, SubjectInfo, QuestionInfo, AnswerInfo, UserPro
 
 admin.site.register(QuestionType)
 admin.site.register(SubjectInfo)
-# admin.site.register(QuestionInfo)
-# admin.site.register(AnswerInfo)
-# admin.site.register(Scores)
-
-
-
-
-# class ReportForm(forms.ModelForm):
-#     def clean(self):
-#         score = self.cleaned_data['score']
-#         max_score  = self.cleaned_data['question'].max_score
-        
-#         if score > max_score:
-#             raise forms.ValidationError({'score': "Score cannot be greater than "+ str(max_score)})
-
-
-# @admin.register(Report)
-# class ReportAdmin(admin.ModelAdmin):
-#     form = ReportForm
-#     list_display = ('user', 'question', 'score')
-
 
 
 """
@@ -46,18 +25,15 @@ class QuestionForm(forms.ModelForm):
             raise forms.ValidationError({'max_score': "Score should be greater than or equal to "+ str(int(min_score))})
 
 
-
 @admin.register(QuestionInfo)
 class QuestionAdmin(admin.ModelAdmin):
     form = QuestionForm
 
 
-
-
-"""
-    Custom Validations
-"""
 class AnswerForm(forms.ModelForm):
+    """
+        Custom Validations
+    """
     def clean(self):
         answer = self.cleaned_data['answer']
         if str(answer) == "None":
@@ -69,13 +45,10 @@ class AnswersAdmin(admin.ModelAdmin):
     form = AnswerForm
     
 
-
-
-
-"""
-    Custom Validations
-"""
 class UserProgressForm(forms.ModelForm):
+    """
+        Custom Validations in admin panel for answer columns
+    """    
     def clean(self):
         mcq_answer = self.cleaned_data['mcq_answer']
         one_word_answer  = self.cleaned_data['one_word_answer']
