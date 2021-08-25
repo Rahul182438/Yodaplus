@@ -3,8 +3,9 @@ import random
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.http.response import HttpResponseRedirect
@@ -26,9 +27,6 @@ class IndexView(TemplateView):
     """
     template_name = "index.html"
     
-
-
-
 
 
 class RegistrationView(FormView):
@@ -121,7 +119,7 @@ class VerifyView(FormView):
     """
     form_class = VerifyForm
     template_name = "registration/otp_verify.html"
-    success_url = "/login"
+    success_url = "login"
 
     def form_valid(self, form):
         user_id = self.kwargs['user_id']
