@@ -1,10 +1,11 @@
 from django.urls import path
 
-from . import views
-from .views import Dashboard
+
+from .views import DashboardView, QuiestionView
 
 app_name = 'dashboard'
 
 urlpatterns = [
-    path('dashboard', Dashboard.as_view(), name='user_dashboard'),
+    path('dashboard', DashboardView.as_view(), name='user_dashboard'),
+    path('questions/<int:pk>/<int:type_id>', QuiestionView.as_view(), name='quiz_questions'),    
 ]

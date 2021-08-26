@@ -1,0 +1,55 @@
+{% extends "dashboard/dashboard.html" %}
+{% load static %}
+
+{% block myblock %}
+{% load custom_tags %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
+<link rel="stylesheet" href="{% static 'css/questionbox.css' %}" >
+
+
+
+<form method="POST">
+{% csrf_token %}
+
+    <div class="questionbox" ><p id="boxtitle" style="text-align: center">Choose any one answer from the following given options</p>
+
+        <div class="radio-toolbar" id="subject_div">
+            {% for question in quiz.questions_obj %}
+            <p>{{forloop.counter}}. {{question.question}}</p>
+            
+            
+         
+            
+                    <div class="container overflow-hidden" style="margin-left: 1%;">
+                        <div class="row gx-5">
+                            {% for answer in quiz.answers_obj %}
+                                {% if answer.question == question %}
+                                
+                                    <div class="col-6">
+                                     <span> {{forloop.counter|to_char}}.
+                                        <input  type="radio" id="radio_{{answer.id}}" name="subject" value="{{answer.id}}">
+                                        <label for="radio_{{answer.id}}">{{answer}}</label>
+                                    </span>
+                                        
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+          
+                        </div>
+                        <hr>
+        
+                      </div>
+                   
+            {% endfor %}
+           
+        </div>
+        
+
+
+    </div>
+</form>
+
+
+{% endblock %}
+

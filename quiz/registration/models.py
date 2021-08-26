@@ -8,9 +8,9 @@ class VerificationStatus(models.Model):
     """
     Model for OTP storing and verification
     """
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
     email_verify = models.BooleanField(default=False)
-    email_otp =  models.CharField(max_length=6)
+    email_otp =  models.CharField(max_length=16)
 
     def __str__(self):
         return str(self.user.username)

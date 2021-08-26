@@ -21,8 +21,6 @@ class QuestionForm(forms.ModelForm):
         
         if score > max_score:
             raise forms.ValidationError({'max_score': "Score should be less than or equal to "+ str(int(max_score))})
-        elif score < min_score:
-            raise forms.ValidationError({'max_score': "Score should be greater than or equal to "+ str(int(min_score))})
 
 
 @admin.register(QuestionInfo)

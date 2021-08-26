@@ -13,6 +13,9 @@ from django.shortcuts import render, redirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+
+import pyotp
 
 from .models import VerificationStatus
 from .forms import SignupForm, VerifyForm
@@ -47,7 +50,7 @@ class RegistrationView(FormView):
         username = form.cleaned_data.get('username')
         email = form.cleaned_data.get('email')
         user_obj = User.objects.get(username=username,email=email)
-        user_otp = generate_otp(6)
+        user_otp = generate_otp()
 
         
         VerificationStatus.objects.create(user=user_obj,email_otp=user_otp)
@@ -69,21 +72,15 @@ class RegistrationView(FormView):
 
 
 
-class LoginView(FormView):
-    """
-    A class for login authentication
-    """    
-
+class LoginFormView(LoginView):
+    
     template_name = "registration/login.html"
-    form_class = AuthenticationForm
-    success_url = 'dashboard'
 
 
     def form_valid(self, form):
 
         username = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password')
-
         user = authenticate(self.request, username=username, password=password)
 
         try:
@@ -97,20 +94,6 @@ class LoginView(FormView):
         elif user is not None and verify_obj:
             login(self.request, user)
             return HttpResponseRedirect(self.get_success_url())
-            
-
-
-
-
-def logout_user(request):
-    """
-    A function defined for user logout
-    """
-    logout(request)
-    return redirect('registration:login')
-
-
-
 
 
 class VerifyView(FormView):
@@ -119,7 +102,7 @@ class VerifyView(FormView):
     """
     form_class = VerifyForm
     template_name = "registration/otp_verify.html"
-    success_url = "login"
+    success_url = reverse_lazy("registration:login")
 
     def form_valid(self, form):
         user_id = self.kwargs['user_id']
@@ -142,10 +125,12 @@ class VerifyView(FormView):
             return redirect('registration:otp_verify',user_id=user_id)
                 
 
-def generate_otp(size):
+def generate_otp():
     """
-    A Random OTP generate function with a combination of uppercase,lowecase and digits. 
-    It takes one argument size so as to return a value with a size of n number of characters
+    A  OTP generate function.
+    OTP generated with PyOTP library with the current timestamp
     """
-    generate_otp = ''.join([random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for n in range (size)])
+    totp = pyotp.TOTP('base32secret3232')
+    generate_otp  = totp.now()
+
     return generate_otp

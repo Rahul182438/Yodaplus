@@ -61,6 +61,10 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+
+            'libraries':{
+                'custom_tags': 'dashboard.template_tags.custom_tags',
+            }
         },
     },
 ]
@@ -113,10 +117,13 @@ STATICFILES_DIRS = (
    STATIC_PATH,
 )
 
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField.UUIDField'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = '587'
-EMAIL_HOST_USER = 'rahulkallil3@gmail.com'
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST = '<YOUR-EMAIL-HOST>'
+EMAIL_PORT = '<YOUR-EMAIL-PORT-ID>'
+EMAIL_HOST_USER = '<YOUR-EMAIL-USER-ID>'
+EMAIL_HOST_PASSWORD = '<YOUR-EMAIL-PASSWORD>'
 EMAIL_USE_TLS = True
+
+LOGIN_REDIRECT_URL = 'dashboard:user_dashboard'
+LOGOUT_REDIRECT_URL = '/'
