@@ -149,7 +149,7 @@
     <div class="quiz-box custom-box div-count{{forloop.counter}}"  style="display:{% if quiz.user_progress_obj %}none{% elif forloop.counter == 1 %} block {% else %} none {% endif %};">
         
             <div class="question-number">
-                Question {{forloop.counter}}  
+                Question {{forloop.counter|add:quiz.question_count}}
             </div>
             
             
@@ -303,12 +303,15 @@ function next_div(...count_attributes){
         $(".div-count"+new_counter).css('display','block')
     }
     // console.log($('.option-count'+counter+':checked').val())
-    
-    // if(($('.option-count'+counter).val() == "") || $('.option-count'+counter+':checked').val()== undefined){
+    console.log($('.option-count'+counter).val(),"@@@@@@@@@")
+    if($('.option-count'+counter).val() == undefined){
         
+        $('.option-count'+counter).val('none')
+        
+        
+    }
+    // else if($('.option-count'+counter+':checked').val()== undefined){
     //     $('.option-count'+counter).val('none')
-        
-    //     $('.option-count'+counter).attr('checked', 'checked');
     // }
 
 
@@ -394,7 +397,6 @@ function timer(){
     if (time.toString().length < 2) {
 
         timerBox.innerHTML = `<b>0${time}:00</b>`
-        $("#current_time").val(time)
         
     } 
     else {

@@ -15,7 +15,10 @@
 
 
     {% for message in messages %}
-    <p>{{message}}</p>
+      <div class="alert alert-danger" style="color:#c91d12">
+        <li> <strong>{{ message|escape }}</strong></li>
+    </div><br>
+    
     {% endfor %}
 
     <div class="clearfix" style="display: flex;justify-content: center;">

@@ -1,6 +1,5 @@
 {% extends 'registration/registration_base.html' %}
 
-
 {% block user_register %}
 <form method="POST" style="border:1px solid #ccc">
     {% csrf_token %}
@@ -19,12 +18,28 @@
 
     <label for="psw-repeat"><b>{{form.password2.label}}</b></label>    
     {{form.password2}}
+
+
+    {% if form.errors %}
+    {% for field in form %}
+        {% for error in field.errors %} 
+           <div class="alert alert-danger" style="color:#c91d12">
+               <li> <strong>{{ error|escape }}</strong></li>
+          </div>
+        {% endfor %}
+    {% endfor %}
+ {% endif %}
+
+
     <div class="clearfix"  style="display: flex;justify-content: center;">
       
       <button type="submit" class="signupbtn">Sign Up</button>
     </div>
+   
+
     <div class="clearfix" style="text-align: center;">
-        {{form.errors}}
+   
+
         Already have an account? <a href="{% url 'registration:login' %}" style="color: darkgoldenrod;"> Login</a>
         
       </div>

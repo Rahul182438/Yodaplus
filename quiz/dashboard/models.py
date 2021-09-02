@@ -64,7 +64,6 @@ class AnswerInfo(models.Model):
 
 class UserProgress(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # type = models.ForeignKey(QuestionType,on_delete=models.CASCADE)
     subject = models.ForeignKey(SubjectInfo,on_delete=models.CASCADE)
     question = models.ForeignKey(QuestionInfo,on_delete=models.CASCADE)
     mcq_answer = models.ForeignKey(AnswerInfo, on_delete=models.CASCADE, null=True, blank=True)
@@ -90,8 +89,8 @@ class UserProgress(models.Model):
         
         elif self.mcq_answer:
             if answers_obj:
-                return str(self.question.question) +'\n Your Answer -> '+str(self.mcq_answer) + '\n Correct Answer ->' + str(answers_obj.answer)
+                return str(self.question.question) +'\n Your Answer -> '+str(self.mcq_answer) + '\n Correct Answer -> ' + str(answers_obj.answer)
         
         else:
-            return str(self.question.question) +'\n You have not answered'
+            return str(self.question.question) +'\n You have not answered' + '\n Correct Answer -> ' + str(answers_obj.answer)
         
