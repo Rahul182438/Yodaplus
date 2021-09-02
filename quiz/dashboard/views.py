@@ -69,15 +69,11 @@ class QuiestionView(DetailView):
                     score_earned += int(progress.question.max_score)
                 elif progress.one_word_answer:
                     
-                    #answers_obj = AnswerInfo.objects.filter(question=progress.question)
                     answers_obj = AnswerInfo.objects.get(question=progress.question,is_correct=True)
 
                     if answers_obj:
                         if str(answers_obj.answer) == str(progress.one_word_answer):
                             score_earned += int(progress.question.max_score)        
-                        # for answer in answers_obj:
-                        #     if str(answer.answer) == str(progress.one_word_answer):
-                        #         score_earned += int(progress.question.max_score)        
                             
             if score_earned == max_score or score_earned == min_score :
                 msg = "You have passed the test with "+str(score_earned)+'/'+str(max_score)+" marks."
@@ -89,15 +85,12 @@ class QuiestionView(DetailView):
 
         else:
             complete = True
-        # print(quest_ids_list)
+
         if quest_ids_list:
             questions_obj = QuestionInfo.objects.filter(subject=self.kwargs.get("pk"),id__in=quest_ids_list)
         else:
             questions_obj = QuestionInfo.objects.filter(subject=self.kwargs.get("pk"))
-        print(count)
-        # if time_used > 0:
-        #     time_used = time_used
-        # print(questions_obj)
+
         query_set = {'questions_obj': questions_obj,
                     'answers_obj': AnswerInfo.objects.all(),
                     'user_progress_obj':user_progress_obj,
@@ -116,7 +109,6 @@ class QuiestionView(DetailView):
 def save_user_progress(request,pk):
 
     postdata = request.POST.copy()
-    print(postdata)
     for data in postdata:
         
         try:

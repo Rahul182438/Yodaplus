@@ -10,7 +10,6 @@
 
 <style type="text/css">
 
-/* importing google fonts */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
 *{
     margin: 0;
@@ -272,10 +271,6 @@ $(document).ready(function(){
     
     }
 
-    console.log(counter_value)
-
-
-
     timer() 
     next_div(counter_value,final_counter,previous_counter) 
    
@@ -302,17 +297,14 @@ function next_div(...count_attributes){
         $(".div-count"+counter).css('display','none')
         $(".div-count"+new_counter).css('display','block')
     }
-    // console.log($('.option-count'+counter+':checked').val())
-    console.log($('.option-count'+counter).val(),"@@@@@@@@@")
+    
     if($('.option-count'+counter).val() == undefined){
         
         $('.option-count'+counter).val('none')
         
         
     }
-    // else if($('.option-count'+counter+':checked').val()== undefined){
-    //     $('.option-count'+counter).val('none')
-    // }
+
 
 
     status = "save"
@@ -393,15 +385,13 @@ function timer(){
     var timerBox = document.getElementById('timer-box')
     var time = $(".interval").val()
 
-    console.log(time.toString().length)
     if (time.toString().length < 2) {
 
         timerBox.innerHTML = `<b>0${time}:00</b>`
         
     } 
     else {
-        console.log('@22')
-        console.log(time)
+
         timerBox.innerHTML = `<b>${time}</b>`
         
         
@@ -409,7 +399,6 @@ function timer(){
 
 
     stored_second ='{{quiz.time_used}}'
-    console.log(stored_second)
 
 
     let minutes = time - 1
