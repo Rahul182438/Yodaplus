@@ -5,15 +5,28 @@
   <title>Dashboard</title>
 
   <link rel="stylesheet" href="{% static 'css/style.css' %}" >
+  <style>
+    .menu {
+      color: white;
+      text-decoration: none;
+    }
+  </style>
 </head>
 
-<body>
-
+<body class="animation-area">
+  
   <div class="banner-text">
+    
     <ul>
-      <li>Home</li>
-      <li>Report</li>
-      <li><a style="color: white;text-decoration: none;" href="{% url 'registration:logout' %}">Logout</a></li>
+     
+      
+        <li style="text-align: left;">Hi {{request.user}},</li>
+      
+      
+      
+      <li> <a class="menu" href="{% url 'dashboard:user_dashboard' %}">Home</a></li>
+      <li> <a class="menu" href="{% url 'dashboard:report' %}">Report</a></li>
+      <li><a class="menu" href="{% url 'registration:logout' %}">Logout</a></li>
     </ul>
     
      {% block myblock %}{% endblock %}
@@ -21,13 +34,13 @@
     
   </div>
 
-  <div class="animation-area">
+  <!-- <div class="animation-area">
     <ul class="box-area">
       <li></li>
       <li></li>
      
     </ul>
-  </div>
+  </div> -->
   
 
 </body>

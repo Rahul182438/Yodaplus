@@ -8,12 +8,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect,HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 
 import pyotp
 
@@ -40,7 +41,7 @@ class RegistrationView(FormView):
     """    
     template_name = "registration/signup.html"
     form_class = SignupForm
-    success_url = 'login'
+    # success_url = 'otp_verify'
 
     """
     Checks the form data submitted is valid
@@ -66,9 +67,10 @@ class RegistrationView(FormView):
 
         email.attach_alternative(email_content, "text/html")
         email.send()
+        return redirect('registration:otp_verify',user_id=user_obj.id)
 
 
-        return super().form_valid(form)
+
 
 
 
@@ -94,6 +96,12 @@ class LoginFormView(LoginView):
         elif user is not None and verify_obj:
             login(self.request, user)
             return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        print("#####")
+        messages.info(self.request, 'Please enter a correct username and password')
+        return super().form_invalid(form)
+        # return super().form_valid(form)
 
 
 class VerifyView(FormView):

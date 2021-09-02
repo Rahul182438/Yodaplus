@@ -13,9 +13,8 @@
     <label for="psw"><b>{{form.password.label}}</b></label>
     {{form.password}}
 
-    {{form.errors}}
 
-    {% for message in  messages %}
+    {% for message in messages %}
     <p>{{message}}</p>
     {% endfor %}
 

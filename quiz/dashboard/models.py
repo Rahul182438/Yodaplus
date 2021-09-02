@@ -30,13 +30,10 @@ class SubjectInfo(models.Model):
         ('Medium','Medium'),
         ('Hard','Hard'),
     )
-    interval_choices = (
-        ('0.5','30 Minutes'),
-        ('1.0','1 Hour'),
-    )
+
     subject_name = models.CharField(max_length=50, choices=subject_choices)
     level = models.CharField(max_length=50, choices=level_choices)
-    interval = models.CharField(max_length=50, choices=interval_choices)
+    interval = models.IntegerField()
     min_score = models.DecimalField(max_digits=5, decimal_places=2)
     max_score = models.DecimalField(max_digits=5, decimal_places=2)
 
@@ -52,8 +49,7 @@ class QuestionInfo(models.Model):
 
     def __str__(self):
         return 'Question' + str(self.id) + ' - ' + str(self.question[:100])
-
-
+    
 class AnswerInfo(models.Model):
     
     question = models.ForeignKey(QuestionInfo, on_delete=models.CASCADE)
@@ -64,23 +60,38 @@ class AnswerInfo(models.Model):
 
     def __str__(self):
         return str(self.answer)
-
+    
 
 class UserProgress(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    type = models.ForeignKey(QuestionType,on_delete=models.CASCADE)
+    # type = models.ForeignKey(QuestionType,on_delete=models.CASCADE)
     subject = models.ForeignKey(SubjectInfo,on_delete=models.CASCADE)
     question = models.ForeignKey(QuestionInfo,on_delete=models.CASCADE)
     mcq_answer = models.ForeignKey(AnswerInfo, on_delete=models.CASCADE, null=True, blank=True)
     one_word_answer = models.CharField(max_length=50, null=True, blank=True)
-    
+    is_complete = models.BooleanField(default=False)
+    time = models.DecimalField(max_digits=5, decimal_places=2,default=0)
 
-    def save(self, *args, **kwargs):
 
-        if self.right_choice or self.wrong_choice:
-            self.is_complete = True
+    def __str__(self):
+        
+        try:
+            answers_obj = AnswerInfo.objects.get(question=self.question,is_correct=True)
+        except:
+            answers_obj = None
+        
+        if self.mcq_answer == None and self.one_word_answer != "":
+            if answers_obj:
+                return str(self.question.question) +'\n Your Answer -> '+str(self.one_word_answer) + '\n Correct Answer -> ' + str(answers_obj.answer)
+        
+        
+        elif self.mcq_answer and self.mcq_answer.is_correct == True:
+            return str(self.question.question) +'\n Correct Answer -> '+str(self.mcq_answer)
+        
+        elif self.mcq_answer:
+            if answers_obj:
+                return str(self.question.question) +'\n Your Answer -> '+str(self.mcq_answer) + '\n Correct Answer ->' + str(answers_obj.answer)
+        
         else:
-            self.is_complete = False
-            
-        super().save(*args, **kwargs)
-
+            return str(self.question.question) +'\n You have not answered'
+        

@@ -13,19 +13,19 @@ admin.site.register(SubjectInfo)
     Custom Validations
 """
 
-class QuestionForm(forms.ModelForm):
-    def clean(self):
-        score = self.cleaned_data['max_score']
-        max_score  = self.cleaned_data['subject'].max_score
-        min_score = self.cleaned_data['subject'].min_score
+# class QuestionForm(forms.ModelForm):
+#     def clean(self):
+#         score = self.cleaned_data['max_score']
+#         max_score  = self.cleaned_data['subject'].max_score
+#         min_score = self.cleaned_data['subject'].min_score
         
-        if score > max_score:
-            raise forms.ValidationError({'max_score': "Score should be less than or equal to "+ str(int(max_score))})
+#         if score > max_score:
+#             raise forms.ValidationError({'max_score': "Score should be less than or equal to "+ str(int(max_score))})
 
 
-@admin.register(QuestionInfo)
-class QuestionAdmin(admin.ModelAdmin):
-    form = QuestionForm
+# @admin.register(QuestionInfo)
+# class QuestionAdmin(admin.ModelAdmin):
+#     form = QuestionForm
 
 
 class AnswerForm(forms.ModelForm):
@@ -42,6 +42,15 @@ class AnswerForm(forms.ModelForm):
 class AnswersAdmin(admin.ModelAdmin):
     form = AnswerForm
     
+
+class AnswerInline(admin.TabularInline):
+    model = AnswerInfo
+    extra = 4
+
+class AnswerQuestionAdmin(admin.ModelAdmin):
+    inlines = [AnswerInline]
+
+admin.site.register(QuestionInfo,AnswerQuestionAdmin)
 
 class UserProgressForm(forms.ModelForm):
     """
