@@ -8,8 +8,9 @@ from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView
 from django.views.generic import ListView, DetailView
 from django.db.models import Count, QuerySet
-from .models import *
 
+
+from .models import *
 
 
 @method_decorator(login_required(login_url='registration:login'),name='dispatch')
@@ -250,12 +251,15 @@ def save_user_progress(request,pk):
                 progress_obj.one_word_answer = None
             else:
                 progress_obj.one_word_answer = postdata[data]
+                if progress_obj.one_word_answer == 'none':
+                    print(progress_obj.one_word_answer,"@@@")
+                    progress_obj.is_complete = True
 
             if postdata[data] == "true":
                 complete = True
-            else:
-                complete = False
-                progress_obj.is_complete = complete
+            # else:
+            #     complete = False
+            #     progress_obj.is_complete = complete
             progress_obj.save()
         else:
             

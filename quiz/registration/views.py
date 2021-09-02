@@ -1,3 +1,4 @@
+
 import string
 import random
 
@@ -15,11 +16,13 @@ from django.views.generic.edit import FormView
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 import pyotp
 
 from .models import VerificationStatus
 from .forms import SignupForm, VerifyForm
+from .decorators import user_is_logged_in
 
 class IndexView(TemplateView):
 
@@ -73,11 +76,10 @@ class RegistrationView(FormView):
 
 
 
-
+@method_decorator(user_is_logged_in,name='dispatch')
 class LoginFormView(LoginView):
     
     template_name = "registration/login.html"
-
 
     def form_valid(self, form):
 
@@ -101,7 +103,6 @@ class LoginFormView(LoginView):
         print("#####")
         messages.info(self.request, 'Please enter a correct username and password')
         return super().form_invalid(form)
-        # return super().form_valid(form)
 
 
 class VerifyView(FormView):
