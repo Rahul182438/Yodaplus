@@ -1,11 +1,11 @@
 from django.http.response import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView
 from django.db.models import Count, QuerySet
 
-from .models import *
+from .models import SubjectInfo, UserProgress, AnswerInfo, QuestionInfo
 
 '''
 login required decorator is used to check whether the user is authenticated before displaying the dashboard pages
@@ -37,7 +37,7 @@ class DashboardView(ListView):
 
         subject_id = self.request.POST.get('subject')
 
-        return redirect('dashboard:quiz_questions',pk=subject_id)
+        return redirect('dashboard:quiz_questions',subject_name=subject_id)
     
         
 
@@ -54,11 +54,12 @@ class QuiestionView(DetailView):
         complete = True
         max_score, min_score,score_earned = 0, 0, 0
         msg = ""
-        subject_obj = SubjectInfo.objects.get(id=self.kwargs.get("pk"))
+        subject_obj = SubjectInfo.objects.get(url_slug=self.kwargs.get("subject_name"))
+        
         max_score = int(subject_obj.max_score)
         min_score = int(subject_obj.min_score)
         time_used = 0
-        user_progress_obj = UserProgress.objects.filter(user=self.request.user,subject=self.kwargs.get("pk"))
+        user_progress_obj = UserProgress.objects.filter(user=self.request.user,subject=subject_obj)
         
         my_answer_list = []
         quest_ids_list = []
@@ -120,9 +121,9 @@ class QuiestionView(DetailView):
         Else it will display all the questions 
         '''
         if quest_ids_list:
-            questions_obj = QuestionInfo.objects.filter(subject=self.kwargs.get("pk"),id__in=quest_ids_list)
+            questions_obj = QuestionInfo.objects.filter(subject=subject_obj,id__in=quest_ids_list)
         else:
-            questions_obj = QuestionInfo.objects.filter(subject=self.kwargs.get("pk"))
+            questions_obj = QuestionInfo.objects.filter(subject=subject_obj)
 
 
 
@@ -147,9 +148,13 @@ class QuiestionView(DetailView):
 '''
 On each next button user clicks in the question this function is called via ajax 
 '''
-def save_user_progress(request,pk):
+def save_user_progress(request,subject_name):
 
     postdata = request.POST.copy()
+    print("###")
+    subject_obj = SubjectInfo.objects.get(url_slug=subject_name)
+    print(postdata)
+    print(subject_obj)
     '''
     Looping through all the data submitted
     '''    
@@ -168,7 +173,7 @@ def save_user_progress(request,pk):
         checks if user's progress for the selected quiz questions
         '''
         try:
-            progress_obj = UserProgress.objects.get(user=request.user,question_id=data,subject_id=pk)
+            progress_obj = UserProgress.objects.get(user=request.user,question_id=data,subject=subject_obj)
         except:
             progress_obj = None            
     
@@ -205,7 +210,7 @@ def save_user_progress(request,pk):
                 user_progress_obj.user = request.user
                 
                 user_progress_obj.question_id = data
-                user_progress_obj.subject_id = pk
+                user_progress_obj.subject = subject_obj
                 if answers_obj:
                     user_progress_obj.mcq_answer_id = answers_obj.id
                 else:
@@ -220,7 +225,7 @@ def save_user_progress(request,pk):
                 '''
                 if postdata[data] == "true":
                     complete = True
-                    user_progress_obj = UserProgress.objects.filter(user=request.user,subject_id=pk)
+                    user_progress_obj = UserProgress.objects.filter(user=request.user,subject=subject_obj)
                     for progress in user_progress_obj:
                         progress.is_complete = complete
                         progress.save()
@@ -228,7 +233,7 @@ def save_user_progress(request,pk):
                 '''
                 stores the time taken for each question by user
                 '''
-                user_progress_obj = UserProgress.objects.filter(user=request.user,subject_id=pk)
+                user_progress_obj = UserProgress.objects.filter(user=request.user,subject=subject_obj)
                 for progress in user_progress_obj:
                     progress.time = float(postdata[data])
                     progress.save()                

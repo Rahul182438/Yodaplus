@@ -3,7 +3,7 @@ from django import forms
 from django.utils import tree
 
 from .models import QuestionType, SubjectInfo, QuestionInfo, AnswerInfo, UserProgress
-# Register your models here.
+
 
 admin.site.register(QuestionType)
 admin.site.register(SubjectInfo)

@@ -11,7 +11,7 @@
         
         <div class="radio-toolbar" id="subject_div">
             {% for subject in subjects %}
-            <input type="radio" id="radio_{{subject.id}}" name="subject" value="{{subject.id}}" onclick="show_start()">
+            <input type="radio" id="radio_{{subject.id}}" name="subject" value="{{subject.url_slug}}" onclick="show_start()">
             <label for="radio_{{subject.id}}">{{subject}}</label>
             
             

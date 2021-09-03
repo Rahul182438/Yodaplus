@@ -31,6 +31,7 @@ class SubjectInfo(models.Model):
         ('Hard','Hard'),
     )
 
+    url_slug = models.SlugField(max_length=60, blank=False,unique=True)
     subject_name = models.CharField(max_length=50, choices=subject_choices)
     level = models.CharField(max_length=50, choices=level_choices)
     interval = models.IntegerField()

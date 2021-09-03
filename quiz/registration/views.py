@@ -64,7 +64,7 @@ class RegistrationView(FormView):
 
         email.attach_alternative(email_content, "text/html")
         email.send()
-        return redirect('registration:otp_verify',user_id=user_obj.id)
+        return redirect('registration:otp_verify',username=user_obj.username)
 
 
 
@@ -87,7 +87,7 @@ class LoginFormView(LoginView):
             verify_obj = None
         
         if verify_obj and verify_obj.email_verify == False:
-            return redirect('registration:otp_verify',user_id=user.id)
+            return redirect('registration:otp_verify',username=user.username)
 
         elif user is not None and verify_obj:
             login(self.request, user)
@@ -99,6 +99,7 @@ class LoginFormView(LoginView):
         return super().form_invalid(form)
 
 
+@method_decorator(user_is_logged_in,name='dispatch')
 class VerifyView(FormView):
     """
     A otp verification class
@@ -108,9 +109,9 @@ class VerifyView(FormView):
     success_url = reverse_lazy("registration:login")
 
     def form_valid(self, form):
-        user_id = self.kwargs['user_id']
+        name = self.kwargs['username']
         otp = self.request.POST.get('otp',None)
-        user_obj = User.objects.get(id=user_id)
+        user_obj = User.objects.get(username=name)
         
         if user_obj:
             try:
@@ -125,7 +126,7 @@ class VerifyView(FormView):
         
         else:
             messages.info(self.request, 'OTP is incorrect')
-            return redirect('registration:otp_verify',user_id=user_id)
+            return redirect('registration:otp_verify',user_id=user_obj.username)
                 
 
 def generate_otp():
