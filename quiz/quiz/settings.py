@@ -123,11 +123,6 @@ EMAIL_HOST_USER = '<YOUR-EMAIL-USER-ID>'
 EMAIL_HOST_PASSWORD = '<YOUR-EMAIL-PASSWORD>'
 EMAIL_USE_TLS = True
 
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = '587'
-# EMAIL_HOST_USER = 'rahulkallil3@gmail.com'
-# EMAIL_HOST_PASSWORD = 'sreedeviravindran*'
-# EMAIL_USE_TLS = True
 
 
 LOGIN_REDIRECT_URL = 'dashboard:user_dashboard'
