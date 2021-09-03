@@ -34,8 +34,8 @@ class SubjectInfo(models.Model):
     subject_name = models.CharField(max_length=50, choices=subject_choices)
     level = models.CharField(max_length=50, choices=level_choices)
     interval = models.IntegerField()
-    min_score = models.DecimalField(max_digits=5, decimal_places=2)
-    max_score = models.DecimalField(max_digits=5, decimal_places=2)
+    min_score = models.IntegerField()
+    max_score = models.IntegerField()
 
     def __str__(self):
         return self.subject_name + ' - ' + self.level
@@ -45,7 +45,7 @@ class QuestionInfo(models.Model):
     type = models.ForeignKey(QuestionType, on_delete=models.CASCADE)
     subject = models.ForeignKey(SubjectInfo, on_delete=models.CASCADE)
     question = models.TextField(blank=True,null= True)
-    max_score = models.DecimalField(max_digits=5, decimal_places=2)
+    max_score = models.IntegerField()
 
     def __str__(self):
         return 'Question' + str(self.id) + ' - ' + str(self.question[:100])
