@@ -1,7 +1,8 @@
 from django.urls import path, reverse_lazy
-from . import views
-from .views import IndexView, RegistrationView, LoginFormView, VerifyView
 from django.contrib.auth.views import LogoutView
+
+from .views import IndexView, RegistrationView, LoginFormView, VerifyView
+
 
 app_name = 'registration'
 

@@ -1,14 +1,9 @@
-from django.db.models import query
 from django.http.response import JsonResponse
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, request
-from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.views.generic.edit import FormView
 from django.views.generic import ListView, DetailView
 from django.db.models import Count, QuerySet
-
 
 from .models import *
 
@@ -54,8 +49,6 @@ class QuiestionView(DetailView):
     template_name = 'dashboard/questions.html'
     context_object_name = 'quiz'
 
-
-
     ''''''
     def get_object(self):
         complete = True
@@ -70,16 +63,33 @@ class QuiestionView(DetailView):
         my_answer_list = []
         quest_ids_list = []
         count = 0
+
+        '''
+        checks if user progress is found
+        '''
         if user_progress_obj:
                 
             for progress in user_progress_obj:
-
+                '''
+                For each progress found it stores the complete value.
+                '''
                 complete = progress.is_complete
                 if progress.is_complete == False:
+                    '''
+                    If the respecive question is false a list is created to store the respective question ids.
+                    '''
                     quest_ids_list.append(progress.question_id)
                 else:
                     count += 1
+
+                '''
+                Time used by user is stored
+                '''
                 time_used = progress.time
+
+                '''
+                If user has a correct mcq answer or one word answer score is incremented
+                '''
                 if progress.mcq_answer and progress.mcq_answer.is_correct == True:
                     score_earned += int(progress.question.max_score)
                 elif progress.one_word_answer:
@@ -90,6 +100,9 @@ class QuiestionView(DetailView):
                         if str(answers_obj.answer) == str(progress.one_word_answer):
                             score_earned += int(progress.question.max_score)        
                             
+            '''
+            A text message to be displayed in the frontend according to score earned by the user.
+            '''
             if score_earned == max_score or score_earned == min_score :
                 msg = "You have passed the test with "+str(score_earned)+'/'+str(max_score)+" marks."
 
@@ -101,11 +114,19 @@ class QuiestionView(DetailView):
         else:
             complete = True
 
+
+        '''
+        If quest_ids_list is not empty it will filter out the question that are not completed by user
+        Else it will display all the questions 
+        '''
         if quest_ids_list:
             questions_obj = QuestionInfo.objects.filter(subject=self.kwargs.get("pk"),id__in=quest_ids_list)
         else:
             questions_obj = QuestionInfo.objects.filter(subject=self.kwargs.get("pk"))
 
+
+
+        
         query_set = {'questions_obj': questions_obj,
                     'answers_obj': AnswerInfo.objects.all(),
                     'user_progress_obj':user_progress_obj,
@@ -118,6 +139,9 @@ class QuiestionView(DetailView):
                     }
 
         return query_set
+
+
+
 
 
 '''
@@ -222,11 +246,9 @@ Login is required for the report page to be displayed
 
 @method_decorator(login_required(login_url='registration:login'),name='dispatch')
 class ReportView(ListView):
-
     
     template_name ='dashboard/reports.html'
-    
-    
+
 
     '''
     A GET method is requested

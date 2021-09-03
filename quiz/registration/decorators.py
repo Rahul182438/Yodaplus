@@ -1,8 +1,6 @@
 from functools import wraps
-from django.http import HttpResponseRedirect
-from django.conf import settings
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+
 
 
 def user_is_logged_in(function):

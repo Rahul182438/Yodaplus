@@ -74,11 +74,15 @@ class UserProgress(models.Model):
 
     def __str__(self):
         
+        '''
+        Filter out the return type according to the user has answered the questions
+        '''
         try:
             answers_obj = AnswerInfo.objects.get(question=self.question,is_correct=True)
         except:
             answers_obj = None
         
+
         if self.mcq_answer == None and self.one_word_answer != "":
             if answers_obj:
                 return str(self.question.question) +'\n Your Answer -> '+str(self.one_word_answer) + '\n Correct Answer -> ' + str(answers_obj.answer)
