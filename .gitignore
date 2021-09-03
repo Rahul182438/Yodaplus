@@ -1,8 +1,10 @@
-.vscode/
-myenv/
+*.vscode
+myenv/*
+quiz/registration/*.pyc
+quiz/registration/migrations/*
 quiz/db.sqlite3
-quiz/dashboard/migrations/
-quiz/dashboard/api/
+quiz/registration/migrations/
+quiz/dashboard/migrations
+quiz/dashboard/migrations/*
+quiz/dashboard/api/*
 __pycache__/
-quiz/dashboard/__pycache__/
-quiz/registration/__pycache__/
