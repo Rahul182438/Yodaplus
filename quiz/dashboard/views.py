@@ -151,10 +151,9 @@ On each next button user clicks in the question this function is called via ajax
 def save_user_progress(request,subject_name):
 
     postdata = request.POST.copy()
-    print("###")
+
     subject_obj = SubjectInfo.objects.get(url_slug=subject_name)
-    print(postdata)
-    print(subject_obj)
+
     '''
     Looping through all the data submitted
     '''    
@@ -263,7 +262,7 @@ class ReportView(ListView):
     def get_queryset(self):
         
         query_set = (UserProgress.objects.filter(user=self.request.user)
-                    .values('subject__subject_name','subject_id','is_complete')
+                    .values('subject__subject_name','subject_id','is_complete','subject__url_slug')
                     .annotate(dcount=Count('subject'))
                     )
         return query_set
