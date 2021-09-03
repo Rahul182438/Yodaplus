@@ -44,6 +44,7 @@ class DashboardView(ListView):
 '''
 All questions are fetched for the particular subject selected and displayed
 '''
+@method_decorator(login_required(login_url='registration:login'),name='dispatch')
 class QuiestionView(DetailView):
 
     template_name = 'dashboard/questions.html'
