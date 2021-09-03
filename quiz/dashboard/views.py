@@ -12,43 +12,58 @@ from django.db.models import Count, QuerySet
 
 from .models import *
 
-
+'''
+login required decorator is used to check whether the user is authenticated before displaying the dashboard pages
+'''
 @method_decorator(login_required(login_url='registration:login'),name='dispatch')
 class DashboardView(ListView):
 
+    '''
+    template path is assigned.
+    context_object_name refers to the object name to be used in the corresponding html pages.
+    '''
     
     template_name ='dashboard/quiz_type.html'
     context_object_name = 'quiz_types'
     
 
+    '''
+    When the dashboard page is loaded below given query set is fetched and retuned
+    '''
     def get_queryset(self):
-        query_set = {'types_obj': QuestionType.objects.all(), 
-                    'subjects_obj': SubjectInfo.objects.all(),
-                    }
+        query_set = SubjectInfo.objects.all()
         return query_set
 
+
+    '''
+    Subject selected by user is selected and redirected to the quiz questions pages
+    '''
     def post(self, *args, **kwargs):
-        postdata = self.request.POST.copy()
-        
-        subject_id = postdata.get('subject')
+
+        subject_id = self.request.POST.get('subject')
 
         return redirect('dashboard:quiz_questions',pk=subject_id)
     
         
 
+'''
+All questions are fetched for the particular subject selected and displayed
+'''
 class QuiestionView(DetailView):
 
     template_name = 'dashboard/questions.html'
     context_object_name = 'quiz'
 
-    def get_object(self, queryset=None):
+
+
+    ''''''
+    def get_object(self):
         complete = True
         max_score, min_score,score_earned = 0, 0, 0
         msg = ""
         subject_obj = SubjectInfo.objects.get(id=self.kwargs.get("pk"))
         max_score = int(subject_obj.max_score)
         min_score = int(subject_obj.min_score)
-        total_time = subject_obj.interval
         time_used = 0
         user_progress_obj = UserProgress.objects.filter(user=self.request.user,subject=self.kwargs.get("pk"))
         
@@ -105,20 +120,38 @@ class QuiestionView(DetailView):
         return query_set
 
 
-
+'''
+On each next button user clicks in the question this function is called via ajax 
+'''
 def save_user_progress(request,pk):
 
     postdata = request.POST.copy()
+    '''
+    Looping through all the data submitted
+    '''    
     for data in postdata:
-        
+
+
+        '''
+        checks answer retrieved from user is available in the answers table
+        '''
         try:
             answers_obj = AnswerInfo.objects.get(question_id=data,answer=postdata[data])
         except:
             answers_obj = None
+
+        '''
+        checks if user's progress for the selected quiz questions
+        '''
         try:
             progress_obj = UserProgress.objects.get(user=request.user,question_id=data,subject_id=pk)
         except:
             progress_obj = None            
+    
+
+        '''
+        Checks if progress of user and answers given is available from above and stores the respective id
+        '''
         if progress_obj:
             if answers_obj:
                 progress_obj.mcq_answer_id = answers_obj.id
@@ -126,15 +159,24 @@ def save_user_progress(request,pk):
                 if postdata[data] == 'none':
                     progress_obj.is_complete = True
                 else:
+                    '''
+                    if answer is not available in db stores the user input answer
+                    '''
                     progress_obj.one_word_answer = postdata[data]
-
+            'if complete is retrieved as true the question is completed'
             if postdata[data] == "true":
                 complete = True
 
             progress_obj.save()
         else:
-            
-            if  data != 'complete' and data != 'time':
+            '''
+            If no user progress is found will create a new user progress
+            '''
+
+            '''
+            Removes the complete and time data retrieved from database so as to match the rest of ids with question id in db
+            '''
+            if data != 'complete' and data != 'time':
                 user_progress_obj = UserProgress()
                 user_progress_obj.user = request.user
                 
@@ -146,7 +188,12 @@ def save_user_progress(request,pk):
                     user_progress_obj.one_word_answer = postdata[data]
 
                 user_progress_obj.save()
+
+
             elif data == 'complete':
+                '''
+                Satisies the data retrieved for complete 
+                '''
                 if postdata[data] == "true":
                     complete = True
                     user_progress_obj = UserProgress.objects.filter(user=request.user,subject_id=pk)
@@ -154,6 +201,9 @@ def save_user_progress(request,pk):
                         progress.is_complete = complete
                         progress.save()
             elif data == 'time' and postdata[data]:
+                '''
+                stores the time taken for each question by user
+                '''
                 user_progress_obj = UserProgress.objects.filter(user=request.user,subject_id=pk)
                 for progress in user_progress_obj:
                     progress.time = float(postdata[data])
@@ -165,28 +215,29 @@ def save_user_progress(request,pk):
 
 
 
+
+'''
+Login is required for the report page to be displayed
+'''
+
 @method_decorator(login_required(login_url='registration:login'),name='dispatch')
 class ReportView(ListView):
 
     
     template_name ='dashboard/reports.html'
-    context_object_name = 'reports'
+    
     
 
+    '''
+    A GET method is requested
+    
+    A checks whether user has attempted any quiz 
+    '''
     def get_queryset(self):
         
-       
-
-        user_tests_obj = (UserProgress.objects.filter(user=self.request.user)
-                        .values('subject__subject_name','subject_id','is_complete')
-                        .annotate(dcount=Count('subject'))
+        query_set = (UserProgress.objects.filter(user=self.request.user)
+                    .values('subject__subject_name','subject_id','is_complete')
+                    .annotate(dcount=Count('subject'))
                     )
-        
-        
-        print(user_tests_obj)
-        query_set = {'user_tests': user_tests_obj,
-                    'subjects_obj': SubjectInfo.objects.all()
-                    }
-        
         return query_set
 

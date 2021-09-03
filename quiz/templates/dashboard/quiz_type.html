@@ -1,16 +1,16 @@
 {% extends "dashboard/dashboard.html" %}
 {% load static %}
 {% block myblock %}
-
+{% with object_list as subjects %}
 <link rel="stylesheet" href="{% static 'css/type_style.css' %}" >
 
 <h2>Welcome</h2>
 <form method="POST">
 {% csrf_token %}
     <div class="boxform" ><span id="boxtitle">Choose a exam type</span>
-
+        
         <div class="radio-toolbar" id="subject_div">
-            {% for subject in quiz_types.subjects_obj %}
+            {% for subject in subjects %}
             <input type="radio" id="radio_{{subject.id}}" name="subject" value="{{subject.id}}" onclick="show_start()">
             <label for="radio_{{subject.id}}">{{subject}}</label>
             
@@ -34,7 +34,7 @@ function show_start(){
 
 
 </script>
-
+{% endwith %}
 
 {% endblock %}
 
