@@ -1,0 +1,107 @@
+{% extends 'registration/registration_base.html' %}
+
+{% block user_register %}
+<form method="POST" style="border:1px solid #ccc">
+    {% csrf_token %}
+    
+  <div class="container">
+    <h1>Sign Up</h1>
+    <p>Please fill in this form to create an account.</p>
+    <hr>
+
+    <label for="name"><b>Username</b></label>
+    <input type="text" class="form-control" id="username" name="username">
+    
+    <label for="email"><b>Email</b></label>   
+    <input type="email" class="form-control" id="email" name="email"> 
+    
+    <label for="psw"><b>Password</b></label>
+    <input type="password" class="form-control" id="password" name="password">
+    
+
+    <label for="psw-repeat"><b>Confirm Password</b></label>    
+    <input type="password" class="form-control" id="password2" name="password2">
+    
+
+    <div class="alert alert-danger" style="color:#c91d12">
+      <li> <strong id="errors"></strong></li>
+ </div>
+
+    <div class="clearfix"  style="display: flex;justify-content: center;">
+      
+      <button type="button" class="signupbtn" onclick="signup()">Sign Up</button>
+    </div>
+   
+
+    <div class="clearfix" style="text-align: center;">
+   
+
+        Already have an account? <a href="{% url 'api:login' %}" style="color: darkgoldenrod;"> Login</a>
+        
+      </div>
+  </div>
+</form>
+
+<script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
+<script>
+
+
+
+function signup(){
+
+
+  var data = {}
+
+  var username = $("#username").val()
+  var email =  $("#email").val()
+  var password =  $("#password").val()
+  var confirm_password =  $("#password2").val()
+
+  data = {
+    username : username,
+    email : email,
+    password : password,
+    password2 : confirm_password
+  }
+  $.ajax({
+        type: 'POST',
+        url: 'http://127.0.0.1:8000/api/signup-api/',
+        data: data,
+
+        success: function(response){
+
+          console.log(response,"@@@2")            
+          // window.location.href = url;    
+          if(response['success'] == false){
+            
+            errors = response['errors']
+            console.log(errors)
+            
+            
+            
+            $.each(errors, function(key, value) {
+              console.log(value);
+              $("#errors").html(value)
+            });
+            
+          }
+          else{
+            console.log(response['username'])
+            console.log("######yes")
+            window.location.href = 'http://127.0.0.1:8000/otp-api/user='+response['username']+'/'
+          }
+  
+        },
+        error: function(error){
+            console.log(error)
+        }
+    })
+
+}
+
+
+</script>
+{% endblock %}

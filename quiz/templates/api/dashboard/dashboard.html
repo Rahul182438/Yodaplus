@@ -1,0 +1,43 @@
+{% load static %}
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" >
+  <style>
+    .menu {
+      color: white;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body class="animation-area">
+  
+  <div class="banner-text">
+    
+    <ul>
+     
+      
+        <li style="text-align: left;">Hi {{request.user}},</li>
+      
+      
+      
+      <li> <a class="menu" href="{% url 'dashboard:user_dashboard' %}">Home</a></li>
+      <li> <a class="menu" href="{% url 'dashboard:report' %}">Report</a></li>
+      <li><a class="menu" href="{% url 'registration:logout' %}">Logout</a></li>
+    </ul>
+    
+     {% block myblock %}{% endblock %}
+    
+    
+  </div>
+
+
+
+</body>
+
+{% block scripts %} {% endblock %}
+
+</html>

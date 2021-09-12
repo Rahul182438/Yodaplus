@@ -1,0 +1,106 @@
+<html>
+
+
+<style>
+input[type=text]{
+    
+    font-size: large;
+    text-align: center;
+    
+}
+
+#border{
+    padding: 3%;
+    margin: auto;
+    width: 30%;
+    border: ridge;
+    text-align: center;
+    background:  #FAF8F8;
+    box-shadow: 0 0 4px #ccc;
+    border: solid 1px #ccc
+    
+}
+</style>
+
+<body>
+<form method="POST">
+    
+
+{% csrf_token %}
+<div id="border">
+    <h3>Please enter 6 digit verification code we sent to your email address</h3>
+    <div>
+        <input type="text" name="otp" maxLength="6" size="6" min="0" max="9"  value=""/>
+    </div>
+    <button type="button" class="btn btn-primary btn-embossed" style="margin: 2%;" onclick="otp_verify()">Verify</button>
+    
+    <p id="error"></p>
+    
+
+</div>
+
+</form>
+</body>
+
+<script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
+<script>
+
+function otp_verify(){
+
+
+  var data = {}
+
+  var kwargs = new URLSearchParams(window.location.search)
+  console.log(kwargs)
+  var user = kwargs.get('user')
+  
+  console.log(user)
+  cc
+
+  var username = $("#username").val()
+
+  data = {
+    username : username,
+  }
+  $.ajax({
+        type: 'POST',
+        url: 'http://127.0.0.1:8000/api/verification-api/',
+        data: data,
+
+        success: function(response){
+
+          console.log(response,"@@@2")            
+
+          if(response['success'] == false){
+            
+            errors = response['errors']
+            console.log(errors)
+                        
+            $.each(errors, function(key, value) {
+              console.log(value);
+              $("#errors").html(value)
+            });
+            
+          }
+          
+          else{
+          
+            window.location.href = 'http://127.0.0.1:8000/otp-api/'+response['username']+'/'
+          }
+  
+        },
+        error: function(error){
+            console.log(error)
+        }
+    })
+
+}
+
+
+</script>
+
+
+</html>

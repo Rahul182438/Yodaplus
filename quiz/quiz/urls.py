@@ -20,9 +20,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('registration.urls')),
     path('', include('dashboard.urls')),
+    path('', include('api.urls')),
 
     ##Rest Framework URLS
-    path('api/dashboard/', include('dashboard.api.urls', 'dashboard_api'))
+    path('api/', include('registration.api.urls')),
+    path('api/', include('dashboard.api.urls')),
 
 ]
 

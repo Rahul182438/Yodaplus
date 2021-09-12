@@ -223,6 +223,7 @@ def save_user_progress(request,subject_name):
                 '''
                 Satisies the data retrieved for complete 
                 '''
+                print(postdata)
                 if postdata[data] == "true":
                     complete = True
                     user_progress_obj = UserProgress.objects.filter(user=request.user,subject=subject_obj)

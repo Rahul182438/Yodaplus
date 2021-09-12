@@ -6,5 +6,5 @@ quiz/db.sqlite3
 quiz/registration/migrations/
 quiz/dashboard/migrations
 quiz/dashboard/migrations/*
-quiz/dashboard/api/*
+
 __pycache__/
