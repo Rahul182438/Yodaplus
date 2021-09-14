@@ -99,3 +99,37 @@ class UserProgress(models.Model):
         else:
             return str(self.question.question) +'\n You have not answered' + '\n Correct Answer -> ' + str(answers_obj.answer)
         
+    def report(self):
+        try:
+            answers_obj = AnswerInfo.objects.get(question=self.question,is_correct=True)
+        except:
+            answers_obj = None
+        
+        score = 0
+        is_correct = False
+        
+
+        if self.mcq_answer == None and self.one_word_answer != "":
+            if answers_obj:
+                
+                return str(self.question.question) +'\n Your Answer -> '+str(self.one_word_answer) + '\n Correct Answer -> ' + str(answers_obj.answer), score,is_correct
+                
+        
+        
+        elif self.mcq_answer and self.mcq_answer.is_correct == True:
+            score += self.question.max_score
+            is_correct  = True
+            return str(self.question.question) +'\n Correct Answer -> '+str(self.mcq_answer), score, is_correct
+        
+        elif self.mcq_answer:
+            if answers_obj:
+                return str(self.question.question) +'\n Your Answer -> '+str(self.mcq_answer) + '\n Correct Answer -> ' + str(answers_obj.answer), score, is_correct
+        
+        else:
+            return str(self.question.question) +'\n You have not answered' + '\n Correct Answer -> ' + str(answers_obj.answer), score, is_correct
+
+    def time_calc(self):
+        time_used = 0
+        if self.time:
+            time_used += self.time
+        return str(time_used)

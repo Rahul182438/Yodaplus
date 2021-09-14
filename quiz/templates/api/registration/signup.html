@@ -89,8 +89,9 @@ function signup(){
             
           }
           else{
-            console.log(response['username'])
-            console.log("######yes")
+            
+            sessionStorage.setItem('Token',response['token'])
+            sessionStorage.setItem('username',username)
             window.location.href = 'http://127.0.0.1:8000/otp-api/user='+response['username']+'/'
           }
   

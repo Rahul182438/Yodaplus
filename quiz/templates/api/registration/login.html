@@ -26,7 +26,7 @@
       <button type="button" class="loginbtn" onclick="login()" >Login</button>
     </div>
     <div class="clearfix" style="text-align: center;">
-        Don't have an account? <a href="{% url 'registration:register' %}" style="color: darkgoldenrod;"> Signup</a>
+        Don't have an account? <a href="{% url 'api:register' %}" style="color: darkgoldenrod;"> Signup</a>
         
       </div>
 
@@ -40,7 +40,22 @@
   crossorigin="anonymous"></script>
 <script>
 
-function signup(){
+
+
+$(document).ready(function(){
+
+  var token = sessionStorage.getItem('Token')
+
+  if(token){
+    window.location.href = 'http://127.0.0.1:8000/dashboard-api/'
+  }
+  
+});
+
+
+
+
+function login(){
 
 
   var data = {}
@@ -54,35 +69,60 @@ function signup(){
   }
   $.ajax({
         type: 'POST',
-        url: 'http://127.0.0.1:8000/api/login-api/',
+        url: 'http://127.0.0.1:8000/api/login/',
         data: data,
 
         success: function(response){
 
-          console.log(response,"@@@2")            
-          // window.location.href = url;    
-          if(response['success'] == false){
-            
-            errors = response['errors']
-            console.log(errors)
-            
-            
-            
-            $.each(errors, function(key, value) {
-              console.log(value);
-              $("#errors").html(value)
-            });
-            
+          console.log(response,"@@@2") 
+          console.log(response['token'])
+          var token = response['token']
+          
+          if(token != null){
+            sessionStorage.setItem('Token',token)
+            sessionStorage.setItem('username',username)
+            check_otp_verified()
+            // window.location.href = 'http://127.0.0.1:8000/dashboard-api/'
           }
+          
+
   
         },
         error: function(error){
-            console.log(error)
+            console.log(error,"000")
+            $("#errors").html('Please enter correct username and password')
         }
     })
 
 }
 
+
+function check_otp_verified(){
+
+  var  username = sessionStorage.getItem('username');
+  console.log("####")
+  $.ajax({
+        type: 'GET',
+        url: 'http://127.0.0.1:8000/api/verification-api/'+username+'/',
+  
+        success: function(response){
+
+          otp_verified = response['is_verified']
+          if(otp_verified == true){
+            window.location.href = 'http://127.0.0.1:8000/dashboard-api/'
+          }
+          else{
+            window.location.href = 'http://127.0.0.1:8000/otp-api/user='+username
+          }
+        },
+        error: function(error){
+            console.log(error,"000")
+            $("#errors").html('Please enter correct username and password')
+        }
+    })
+
+
+}
 
 </script>
 {% endblock %}

@@ -6,7 +6,9 @@ from django.contrib.auth.models import User
 
 
 class UserSignupSerializer(serializers.ModelSerializer):
-    
+    """
+    confirm password field and email is a required field for user signup
+    """
     password2 = serializers.CharField(style={'input_type':'password'},write_only=True)
     email = serializers.EmailField(required=True)    
     class Meta:
@@ -18,13 +20,19 @@ class UserSignupSerializer(serializers.ModelSerializer):
         }
 
     def validate_email(self, email):
+        """
+        If entered email is already present in the database validaton error is thrown
+        """
+
         email_obj = User.objects.filter(email=email).first()
         if email_obj:
             raise serializers.ValidationError("Email is already used")
         return email
 
     def validate(self,data):
-        
+        """
+        To check whether the password entered in both the fields are matched
+        """
         if not data.get('password') or not data.get('password2'):
             
             raise serializers.ValidationError("Please enter a password.")
@@ -36,7 +44,9 @@ class UserSignupSerializer(serializers.ModelSerializer):
 
     def save(self):
 
-
+        """
+        If all fields are validated a user entry is created.
+        """
         user_obj = User(
                     username=self.validated_data['username'],
                     email=self.validated_data['email'],
@@ -50,8 +60,11 @@ class UserSignupSerializer(serializers.ModelSerializer):
 
 
 
+
 class VerificationSerializer(serializers.ModelSerializer):
-    
+    """
+    OTP verification serializer. A OTP input field is required
+    """
     email_otp = serializers.CharField(max_length=6,required=True)
     class Meta:
         model = VerificationStatus

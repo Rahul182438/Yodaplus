@@ -1,4 +1,4 @@
-{% extends "dashboard/dashboard.html" %}
+{% extends "api/dashboard/dashboard.html" %}
 {% load static %}
 
 {% block myblock %}
@@ -102,122 +102,60 @@
 
 </style>
 
-{% if quiz.user_progress_obj and quiz.complete == True %}
-<div class="questionbox" >
+
+<div class="questionbox">
     <h6 style="text-align: center;margin-top: 10%;"> You have completed the test.</h6>
     <h3 style="text-align: center;margin-top: 1%;">  {{quiz.msg}}</h3>
-    <div class="container" >
-        
-        
-        {% for user_answers in quiz.user_progress_obj %}
-            
-            
-                    {% if user_answers.mcq_answer %}
-                        
-                        <div class="col p-3 text-light h6 {% if user_answers.mcq_answer.is_correct == True %}bg-success{% else %}bg-danger{% endif %}" style="padding: 1%;line-height: 2.4;">
-                            {{user_answers|linebreaksbr}}
-                        </div>
-                    
-                        {% else %}
-                    
-                            <div class="col p-3 text-light h6 {% if user_answers.mcq_answer %}bg-success{% else %}bg-danger{% endif %}" style="padding: 1%;line-height: 2.4;">
-                                {{user_answers|linebreaksbr}}
-                            </div>
-                        {% endif %}
-          {% endfor %}
-          
-        
+    <div class="container"  id="user_report">
+
+           
+
       </div>
 </div>
 
 
-{% else %}
+
 
 <form method="POST" id="questions_form">
 {% csrf_token %}
-{% if quiz.questions_obj %}
+
 <div class="timer-box" style="margin-top: 5%;">
 <input type="hidden" id="current_time" value="">
 <div class="col text-right" id="timer-box" style="text-align: center;margin-right: 2%;"></div>
 
 </div>
-    {% for question in quiz.questions_obj %}
 
     
-    <div class="quiz-box custom-box div-count{{forloop.counter}}"  style="display:{% if quiz.user_progress_obj %}none{% elif forloop.counter == 1 %} block {% else %} none {% endif %};">
+    <div class="quiz-box custom-box div-count{{forloop.counter}}" >
         
             <div class="question-number">
-                Question {{forloop.counter|add:quiz.question_count}}
+                Question 
             </div>
             
             
-            <input type="hidden"  class="interval" value="{{question.subject.interval}}">
-            <div class="question-text" >
-                {{question.question}}
+            <input type="hidden"  class="interval" value="">
+            <div  id="question-text" class="question-text" >
+                
             </div>
-            {% if question.type.type_name == 'MCQ' %}
+            <div id="mcq_container" class="option-container" >
+                    
+        
+            </div>
+            
 
-                <div class="option-container" >
-                    {% for answer in quiz.answers_obj %}
-                        {% if answer.question == question  %}
-                            <div class="option">
-                                <input type="hidden" id="counter_value" value="{{forloop.parentloop.counter}}">
-                                <input type="hidden" id="final_counter" value="{{forloop.last}}">
-                                <input class="ans option-count{{forloop.parentloop.counter}}" type="radio" id="radio_{{answer.id}}" name="{{question.id}}" 
-                                value="{{answer.answer}}" {% if quiz.user_progress_obj %}{% for prog in quiz.user_progress_obj %}{% if prog.mcq_answer.id == answer.id %}checked{% endif %}{% endfor %}{% endif %}>
-                                {{answer.answer}}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
 
-            {% else %}
-                <div class="option-container" >
-                    {% for answer in quiz.answers_obj %}
-                        {% if answer.question == question  %}
-                            <div class="option">
-                                <input type="hidden" id="counter_value" value="{{forloop.parentloop.counter}}">
-                                <input type="hidden" id="final_counter" value="{{forloop.last}}">
-                                Ans - <input type="text" class="ans option-count{{forloop.parentloop.counter}}" id="usr" name="{{question.id}}" value="{% for submit in quiz.user_progress_obj %}{% if submit.question.id == question.id %}{{submit.one_word_answer}}{% endif %}{% endfor %}">
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-
-            {% endif %}
 
             <div class="next-question-button">
-                {% if forloop.last %}
-                    <input type="submit" class="btn"  value="Submit">
-                {% else %}
-                    <button type="button" class = "btn" onclick="next_div('{{forloop.counter}}','{{forloop.last}}')">Next</button>
-                {% endif %}
-
+                
+                    <input type="button" class="btn"  onclick="save_answers()" value="Submit">
+                
             </div>
     
     </div>
-    {% endfor %}
-
-    {% else %}
-    <div class="quiz-box custom-box"  style="margin: 15% auto">
-        
-        <div class="question-number" style="text-align: center;">
-            No Questions Found
-        </div>
-        <div class="next-question-button" style="text-align: center;">
-            
-                <a href="{% url 'dashboard:user_dashboard' %}" type="button" class="btn" >Back</a>
-            
-
-        </div>        
-    </div>
     
 
-    {% endif %}
 </form>
 
-
-{% endif %}
 
 
 
@@ -235,175 +173,231 @@ var csrf = document.getElementsByName('csrfmiddlewaretoken')
 
 $(document).ready(function(){
 
-    var counter_value = parseInt($("#counter_value").val())
-    var previous_counter = 0
-    var final_counter = $("#final_counter").val()
-
+    $(".boxform").css('display','none');
+    $("#welcome").css('display','none');
+    time_avail();
+    questions();
     
-
-    while (counter_value > 0){
-        var inputType = $('.option-count'+counter_value).attr('type')
-
-        if((inputType == 'radio') && ($('.option-count'+counter_value+':checked').val())){
-            
-            
-            previous_counter = counter_value
-            counter_value = counter_value + 1
-            
-        }
-        else if(inputType == 'text'){
-            
-            var input_value = $('.option-count'+counter_value).val()
-            
-            
-            if(input_value){
-                previous_counter = counter_value
-                counter_value = counter_value + 1
-            }
-            else{
-                break;
-            }
-        }
-        else{
-            break;
-        }
-            
-    
-    }
-
-    timer() 
-    next_div(counter_value,final_counter,previous_counter) 
-   
 
 });
 
 
-
-function next_div(...count_attributes){
+function questions(){
     
-    new_counter = count_attributes[0]
-    is_last = count_attributes[1]
-    counter =  count_attributes[2]
-    if(counter == undefined){
-        counter = new_counter
-    }
-    new_counter = parseInt(counter) + 1
 
-    if(is_last == "True"){
-        window.location.href = "{% url 'dashboard:user_dashboard' %}";    
-    }
-    else{
+    var token = sessionStorage.getItem('Token')
+    var subject = sessionStorage.getItem('subject')
+    var element = ""
+        $.ajax({
+                type: 'GET',
+                url: "http://127.0.0.1:8000/api/questions/"+subject,
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                    "Authorization": "Token " + token
+                },
+                success:function(data){
+
+                    if(data.length == 0){
+                        
+                        $(".questionbox").show()
+                        $("#questions_form").hide()
+                        report()
+
+                    }
+                    else{
+                        
+                        $(".questionbox").hide()
+                        
+                        $("#questions_form").show()
+                        $("#question-text").html(data[0]['question'])
+                        
+                        $(".interval").val(data[0]['subject']['interval'])
+
+                        var question_type = data[0]['type']
+                        
+                        var question_id = data[0]['id']
+                        if(question_type == 1){
+                            mcq_options(question_id) 
+                        }
+                        else{                                
+                                element += `
+                                <input type="text" class="ans option-count" id="usr_one_word" name="${question_id}" value="">
+                                `
+                                $("#mcq_container").html(element)
+                            }
+
+                        total_time = data[0]['subject']['interval']
+                        timer_func(total_time)
+                    }
+                    
+
+            }
+        });
+
         
-        $(".div-count"+counter).css('display','none')
-        $(".div-count"+new_counter).css('display','block')
-    }
-    
-    if($('.option-count'+counter).val() == undefined){
-        console.log("#########")
-        $('.option-count'+counter).val('none')
-        console.log($('.option-count'+counter).val())
-        
-    }
-
-
-    status = "save"
-    store_answers(status)    
 }
 
-var store_answers = (status) => {
+
+
+
+function mcq_options(question_id){
+
     
-    var elements = [...document.getElementsByClassName('ans')]
+
+    var token = sessionStorage.getItem('Token')
     
+        $.ajax({
+                type: 'GET',
+                url: "http://127.0.0.1:8000/api/answers/"+question_id,
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                    "Authorization": "Token " + token
+                },
+                success:function(data){
+                    
+                    var element = ""
+                    $.each(data, function(key, value) {
+                    
+                    element += `
+                        <input class="ans option-count" type="radio" name="${value['question']}" id="${value['id']}" value="${value['answer']}"
+                            required>
+                        <label class="form-check-label" for="${value['id']}">${value['answer']}</label>
+                        <br>
+                        `
+
+                    $("#mcq_container").html(element)
+                    });    
+
+            }
+        });
+
+
+}
+
+
+
+
+function save_answers(){
     
+
     var data = {}
 
+    var inputType = $('.option-count').attr('type')
+    var user_answer = ""
+    var question_id = ""
+    question_id = $('.option-count').attr('name');
+    if(inputType == 'radio'){
         
+      user_answer = $('.option-count:checked').val()
+      
+    }
+    else{
+        user_answer = $('#usr_one_word').val()
+        
+    }
+    if(user_answer == undefined){
+        user_answer = ""
+    }
     
-    var csrf_token = csrf[0].value
-    elements.forEach(el=>{
-        
-        if(el.type == 'radio')
-        {   
-            
-            
-            if (el.checked) {
-                
-                data[el.name] = el.value
-            } 
-            else{
-                
-                if (!data[el.name]) {
-                    data[el.name] = null
-                }
-            }
-        }
-        else if(el.type == 'text'){
+    
+    var complete = true
+    var time = $("#current_time").val()
 
-            if(el.value){
-                data[el.name] = el.value    
-            }
-            else{
-                data[el.name] = null
-            }
-            
-        }
-        
-        if(status == "redirect"){
-            data['complete'] = "true";
-        }
-        else{
-            data['complete'] = "false";
-        }
-        data['time'] = $("#current_time").val()
-    })
+    var username = sessionStorage.getItem('username')
+    var subject = sessionStorage.getItem('subject')
+    data = {
 
-    $.ajax({
-        type: 'POST',
-        url: `${url}/save/`,
-        data: data,
-        headers: {
-           'X-CSRFToken': csrf_token
-         },
-        success: function(response){
+        question : question_id,
+        user_answer : user_answer,
+        time : time,
+        complete : complete,
 
-            if(status == 'redirect'){
-                window.location.href = url;    
+    }
+    
+
+    var token = sessionStorage.getItem('Token')
+    
+        $.ajax({
+                type: 'POST',
+                url: 'http://127.0.0.1:8000/api/user_progress/',
+                headers: {
+                    "Content-type": "application/json",
+                    "Authorization": "Token " + token
+                },
+                data: JSON.stringify(data),
+
+                success:function(data){
+                    
+                    location.reload();
+
             }
-  
-        },
-        error: function(error){
-            console.log(error)
-        }
-    })
+        });
+
+
+}
+
+
+function report(){
+
+    
+    var token = sessionStorage.getItem('Token')
+    var subject = sessionStorage.getItem('subject')
+    var element = ""
+        $.ajax({
+                type: 'GET',
+                url: "http://127.0.0.1:8000/api/reports/"+subject,
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                    "Authorization": "Token " + token
+                },
+                success:function(data){
+                    
+                    var element_report = ''
+                    $.each(data, function(key, value) {
+                        
+                        console.log(value)
+                        if(value['report'][2] == true){
+                            element_report += `<div class="col p-3 text-light h6 bg-success" style="padding: 1%;line-height: 2.4;">${value['report'][0]}</div>`
+                        }
+                        else{
+                            element_report += `<div class="col p-3 text-light h6 bg-danger" style="padding: 1%;line-height: 2.4;">${value['report'][0]}</div>`
+                        }
+                        
+
+                        $("#user_report").html(element_report)
+                    });
+                  
+
+            }
+        });
+
+
+
 }
 
 
 
+function timer_func(total_time){
 
-function timer(){
 
+    time = total_time
+    
     var timerBox = document.getElementById('timer-box')
-    var time = $(".interval").val()
 
     if (time.toString().length < 2) {
 
         timerBox.innerHTML = `<b>0${time}:00</b>`
-        
     } 
-    else {
 
+    else {
         timerBox.innerHTML = `<b>${time}</b>`
-        
-        
     }
 
-
-    stored_second ='{{quiz.time_used}}'
-
-
+    stored_second = sessionStorage.getItem('total_time_used')
+    
     let minutes = time - 1
     let seconds = 60
-    
+
     if(parseInt(stored_second) > 0){
         
         const myArr = stored_second.split(".");
@@ -419,7 +413,7 @@ function timer(){
         seconds = (seconds * 100).toFixed(2)
         
     }
-    
+
     let displaySeconds
     let displayMinutes
     let count = 60
@@ -436,26 +430,27 @@ function timer(){
         } else {
             displayMinutes = minutes
         }
+
+
         if(seconds.toString().length < 2) {
             displaySeconds = '0' + seconds
         } else {
             displaySeconds = seconds
         }
-        if (minutes === 0 && seconds === 0) {
+
+        if (minutes == 0 && seconds == 0) {
             timerBox.innerHTML = "<b>00:00</b>"
             
             setTimeout(()=>{
                 clearInterval(timer)
-                status = "redirect"
                 
-                store_answers(status)
             }, 500)
         }
 
         timerBox.innerHTML = `<b>${displayMinutes}:${displaySeconds}</b>`
         $("#current_time").val(displayMinutes)
-        
-        
+    
+
         new_seconds = count - displaySeconds
         
         
@@ -474,20 +469,54 @@ function timer(){
             time_spent = count_minutes.toString() +'.'+ new_seconds.toString()
         }
         
-        
         $("#current_time").val(time_spent)
+
+
     }, 1000)
+    
 
 }
 
 
+function time_avail(){
 
-quizForm.addEventListener('submit', e=>{
-    e.preventDefault()
-    status = "redirect"
-    store_answers(status)
-})
+    var token = sessionStorage.getItem('Token')
+    
+    $.ajax({
+            type: 'GET',
+            url: "http://127.0.0.1:8000/api/time/",
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                "Authorization": "Token " + token
+            },
+            success:function(data){
+                
+                total_time_used = 0.00
+                console.log(data)
+                if(data.length >0 ){
+                    last_obj = Object.keys(data)[Object.keys(data).length-1];
+                    total_time_used = data[last_obj]['time_calc']
+                    console.log(total_time_used)
+                }
 
+                // $.each(data, function(key, value) {
+                //     total_time_used = parseFloat(value['time_calc'])
+
+                // });
+                
+                sessionStorage.setItem('total_time_used',total_time_used)
+
+            }
+        });
+}
+
+function logout() {
+  sessionStorage.setItem('Token', '')
+  sessionStorage.setItem('total_time_used', '')
+  sessionStorage.setItem('subject', '')
+  sessionStorage.setItem('username', '')
+  location.reload()
+}
 </script>
 {% endblock %}
 

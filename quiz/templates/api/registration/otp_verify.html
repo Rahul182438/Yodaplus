@@ -30,11 +30,11 @@ input[type=text]{
 <div id="border">
     <h3>Please enter 6 digit verification code we sent to your email address</h3>
     <div>
-        <input type="text" name="otp" maxLength="6" size="6" min="0" max="9"  value=""/>
+        <input type="text" id="otp_field" name="otp" maxLength="6" size="6" min="0" max="9"  value=""/>
     </div>
     <button type="button" class="btn btn-primary btn-embossed" style="margin: 2%;" onclick="otp_verify()">Verify</button>
     
-    <p id="error"></p>
+    <p id="errors" style="color: red;"></p>
     
 
 </div>
@@ -53,44 +53,36 @@ function otp_verify(){
 
   var data = {}
 
-  var kwargs = new URLSearchParams(window.location.search)
-  console.log(kwargs)
-  var user = kwargs.get('user')
+  
+  var user = sessionStorage.getItem('username')
   
   console.log(user)
-  cc
-
-  var username = $("#username").val()
+  
+  var otp = $("#otp_field").val()
 
   data = {
-    username : username,
+    otp : otp,
   }
   $.ajax({
         type: 'POST',
-        url: 'http://127.0.0.1:8000/api/verification-api/',
+        url: 'http://127.0.0.1:8000/api/verification-api/'+user+'/',
         data: data,
 
         success: function(response){
 
           console.log(response,"@@@2")            
 
-          if(response['success'] == false){
+          if(response['success'] == true){
             
-            errors = response['errors']
-            console.log(errors)
-                        
-            $.each(errors, function(key, value) {
-              console.log(value);
-              $("#errors").html(value)
-            });
-            
+            window.location.href = 'http://127.0.0.1:8000/login-api'
+
           }
-          
           else{
-          
-            window.location.href = 'http://127.0.0.1:8000/otp-api/'+response['username']+'/'
+            errors = response['response']
+            
+            $("#errors").html(errors)              
           }
-  
+         
         },
         error: function(error){
             console.log(error)

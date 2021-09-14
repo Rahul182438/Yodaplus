@@ -5,6 +5,7 @@
   <title>Dashboard</title>
 
   <link rel="stylesheet" href="{% static 'css/style.css' %}" >
+  <link rel="stylesheet" href="{% static 'css/type_style.css' %}" > 
   <style>
     .menu {
       color: white;
@@ -20,24 +21,122 @@
     <ul>
      
       
-        <li style="text-align: left;">Hi {{request.user}},</li>
+        <li id="username" style="text-align: left;"></li>
       
       
       
-      <li> <a class="menu" href="{% url 'dashboard:user_dashboard' %}">Home</a></li>
-      <li> <a class="menu" href="{% url 'dashboard:report' %}">Report</a></li>
-      <li><a class="menu" href="{% url 'registration:logout' %}">Logout</a></li>
+      <li> <a class="menu" href="{% url 'api:dashboard-api' %}">Home</a></li>
+      <!-- <li> <a class="menu" >Report</a></li> -->
+      <li><a class="menu" onclick="logout()" style="cursor: pointer;">Logout</a></li>
     </ul>
     
-     {% block myblock %}{% endblock %}
-    
+     
+     <h2 id="welcome">Welcome</h2>
+     <form method="POST">
+      {% csrf_token %}
+          <div class="boxform" ><span id="boxtitle">Choose a exam type</span>
+              
+              <div class="radio-toolbar" id="subject_div">
+                
+                  <!-- <input type="radio" id="radio_{{subject.id}}" name="subject" value="{{subject.url_slug}}" onclick="show_start()">
+                  <label for="radio_{{subject.id}}">{{subject}}</label> -->
+  
+                 
+              </div>
+              
+      
+              <button id="submit" class="nxt_btn" type="button" value="Submit" style="display: none;">Start</button>
+              
+          </div>
+      </form>
+      {% block myblock %}{% endblock %}   
     
   </div>
 
 
 
+
+
+
 </body>
 
-{% block scripts %} {% endblock %}
+{% block scripts %}
+
+{% endblock %}
+<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script>
+
+
+
+$( document ).ready(function() {
+  
+  
+    var username = sessionStorage.getItem('username')
+    var token = sessionStorage.getItem('Token')  
+    console.log(token)
+      
+    if(token == ""){
+      window.location.href = "http://127.0.0.1:8000"
+    }
+    $("#username").html('Hi ' + username)
+
+    subjects()
+  });
+
+
+
+function subjects(){
+  var token = sessionStorage.getItem('Token')
+  $.ajax({
+            type: 'GET',
+            url: "http://127.0.0.1:8000/api/dashboard",
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                "Authorization": "Token " + token
+            },
+            success:function(data){
+
+              var element = ''
+                $.each(data, function(key, value) {
+
+                 element += `
+                  <input type="radio" id="radio_${value['id']}" name="subject" value="${value['url_slug']}" onclick="show_start()">
+                    <label for="radio_${value['id']}">${value['subject_name']}</label>
+                    `
+                
+                $("#subject_div").html(element)
+              });
+            },
+            error: function(error){
+              window.location.href = "http://127.0.0.1:8000"
+            }
+
+        });
+}
+
+function show_start(){
+  
+    $( "#submit" ).show("slow");
+  
+}
+
+$('#submit').click(function(){
+  var subject_selected = $('input[name="subject"]:checked').val();
+  
+  sessionStorage.setItem('subject',subject_selected)
+  window.location.href = 'http://127.0.0.1:8000/questions-api/'+subject_selected
+  
+});
+
+
+function logout() {
+  sessionStorage.setItem('Token', '')
+  sessionStorage.setItem('total_time_used', '')
+  sessionStorage.setItem('subject', '')
+  sessionStorage.setItem('username', '')
+  window.location.href = "http://127.0.0.1:8000"
+  
+}
+</script>
 
 </html>

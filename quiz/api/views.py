@@ -21,3 +21,13 @@ class LoginApiView(TemplateView):
 class VerificationApiView(TemplateView):
     
     template_name = "api/registration/otp_verify.html"
+
+
+class DashboardView(TemplateView):
+    
+    template_name = "api/dashboard/dashboard.html"
+
+
+class QuestionsView(TemplateView):
+    
+    template_name = "api/dashboard/questions.html"
