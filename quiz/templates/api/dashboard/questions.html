@@ -15,7 +15,7 @@
 {% block myblock %}
 <div class="questionbox">
     <h6 style="text-align: center;margin-top: 10%;"> You have completed the test.</h6>
-    <h3 style="text-align: center;margin-top: 1%;">  {{quiz.msg}}</h3>
+    <h3 style="text-align: center;margin-top: 1%;"></h3>
     <div class="container"  id="user_report">
 
            
@@ -36,7 +36,7 @@
 </div>
 
     
-    <div class="quiz-box custom-box div-count{{forloop.counter}}" >
+    <div class="quiz-box custom-box div-count" >
         
             <div class="question-number">
                 Question 
@@ -257,16 +257,12 @@ function report(){
                     
                     var element_report = ''
                     $.each(data, function(key, value) {
-                        
-                        console.log(value)
                         if(value['report'][2] == true){
                             element_report += `<div class="col p-3 text-light h6 bg-success" style="padding: 1%;line-height: 2.4;">${value['report'][0]}</div>`
                         }
                         else{
                             element_report += `<div class="col p-3 text-light h6 bg-danger" style="padding: 1%;line-height: 2.4;">${value['report'][0]}</div>`
                         }
-                        
-
                         $("#user_report").html(element_report)
                     });
                   
@@ -395,20 +391,12 @@ function time_avail(){
             success:function(data){
                 
                 total_time_used = 0.00
-                console.log(data)
+                
                 if(data.length >0 ){
                     last_obj = Object.keys(data)[Object.keys(data).length-1];
                     total_time_used = data[last_obj]['time_calc']
-                    console.log(total_time_used)
                 }
-
-                // $.each(data, function(key, value) {
-                //     total_time_used = parseFloat(value['time_calc'])
-
-                // });
-                
                 sessionStorage.setItem('total_time_used',total_time_used)
-
             }
         });
 }

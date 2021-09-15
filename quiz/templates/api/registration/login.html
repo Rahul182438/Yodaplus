@@ -73,11 +73,7 @@ function login(){
         data: data,
 
         success: function(response){
-
-          console.log(response,"@@@2") 
-          console.log(response['token'])
-          var token = response['token']
-          
+          var token = response['token']          
           if(token != null){
             sessionStorage.setItem('Token',token)
             sessionStorage.setItem('username',username)
@@ -89,7 +85,6 @@ function login(){
   
         },
         error: function(error){
-            console.log(error,"000")
             $("#errors").html('Please enter correct username and password')
         }
     })
@@ -100,7 +95,6 @@ function login(){
 function check_otp_verified(){
 
   var  username = sessionStorage.getItem('username');
-  console.log("####")
   $.ajax({
         type: 'GET',
         url: 'http://127.0.0.1:8000/api/verification-api/'+username+'/',
@@ -116,7 +110,6 @@ function check_otp_verified(){
           }
         },
         error: function(error){
-            console.log(error,"000")
             $("#errors").html('Please enter correct username and password')
         }
     })

@@ -2,7 +2,7 @@
 
 {% block user_register %}
 <form method="POST" style="border:1px solid #ccc">
-    {% csrf_token %}
+{% csrf_token %}
     
   <div class="container">
     <h1>Sign Up</h1>
@@ -31,13 +31,9 @@
       
       <button type="button" class="signupbtn" onclick="signup()">Sign Up</button>
     </div>
-   
 
     <div class="clearfix" style="text-align: center;">
-   
-
         Already have an account? <a href="{% url 'api:login' %}" style="color: darkgoldenrod;"> Login</a>
-        
       </div>
   </div>
 </form>
@@ -72,18 +68,10 @@ function signup(){
         data: data,
 
         success: function(response){
-
-          console.log(response,"@@@2")            
-          // window.location.href = url;    
-          if(response['success'] == false){
-            
+          if(response['success'] == false){            
             errors = response['errors']
-            console.log(errors)
-            
-            
-            
+
             $.each(errors, function(key, value) {
-              console.log(value);
               $("#errors").html(value)
             });
             

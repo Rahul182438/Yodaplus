@@ -51,13 +51,8 @@ input[type=text]{
 function otp_verify(){
 
 
-  var data = {}
-
-  
+  var data = {}  
   var user = sessionStorage.getItem('username')
-  
-  console.log(user)
-  
   var otp = $("#otp_field").val()
 
   data = {
@@ -69,17 +64,11 @@ function otp_verify(){
         data: data,
 
         success: function(response){
-
-          console.log(response,"@@@2")            
-
           if(response['success'] == true){
-            
             window.location.href = 'http://127.0.0.1:8000/login-api'
-
           }
           else{
             errors = response['response']
-            
             $("#errors").html(errors)              
           }
          
@@ -91,8 +80,5 @@ function otp_verify(){
 
 }
 
-
 </script>
-
-
 </html>

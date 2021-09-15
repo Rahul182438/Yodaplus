@@ -20,14 +20,8 @@
   <div class="banner-text">
     
     <ul>
-     
-      
         <li id="username" style="text-align: left;"></li>
-      
-      
-      
       <li> <a class="menu" href="{% url 'api:dashboard-api' %}">Home</a></li>
-      <!-- <li> <a class="menu" >Report</a></li> -->
       <li><a class="menu" onclick="logout()" style="cursor: pointer;">Logout</a></li>
     </ul>
     
@@ -38,13 +32,8 @@
           <div class="boxform" ><span id="boxtitle">Choose a exam type</span>
               
               <div class="radio-toolbar" id="subject_div">
-                
-                  <!-- <input type="radio" id="radio_{{subject.id}}" name="subject" value="{{subject.url_slug}}" onclick="show_start()">
-                  <label for="radio_{{subject.id}}">{{subject}}</label> -->
-  
                  
               </div>
-              
       
               <button id="submit" class="nxt_btn" type="button" value="Submit" style="display: none;">Start</button>
               
@@ -54,11 +43,6 @@
     
   </div>
 
-
-
-
-
-
 </body>
 
 {% block scripts %}
@@ -67,14 +51,12 @@
 <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script>
 
-
-
 $( document ).ready(function() {
   
   
     var username = sessionStorage.getItem('username')
     var token = sessionStorage.getItem('Token')  
-    console.log(token)
+    
       
     if(token == ""){
       window.location.href = "http://127.0.0.1:8000"
