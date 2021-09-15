@@ -1,108 +1,18 @@
 {% extends "api/dashboard/dashboard.html" %}
 {% load static %}
 
-{% block myblock %}
-
+{% block css_block %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 
 <link rel="stylesheet" href="{% static 'css/questionbox.css' %}" >
 
+<link rel="stylesheet" href="{% static 'css/questions.css' %}" >
 
-<style type="text/css">
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-.custom-box{
-    max-width: 700px;
-    background-color: #ffffff;
-    margin: 40px auto;
-    padding: 30px;
-    border-radius: 10px;
-}   
-
-.timer-box{
-    max-width: 97px;
-    background-color: #ffffff;
-    margin: 22px auto;
-    padding: 10px;
-    border-radius: 10px;
-}   
-.home-box h3{
-    font-size: 18px;
-    color: #000000;
-    font-weight: 500;
-    margin-bottom: 15px;
-    line-height: 25px;
-}
-
-.home-box p{
-    font-size: 16px;
-    margin-bottom: 10px;
-    line-height: 22px;
-    color: #000000;
-    font-weight: 400;
-}
-
-.home-box p span{
-    font-weight: 400;
-}
-
-.btn{
-    padding: 15px 45px;
-    background-color: #009688;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.quiz-box .question-number{
-    font-size: 18px;
-    color: #009688;
-    font-weight: 600;
-    border-bottom: 1px solid #cccccc;
-    padding-bottom: 10px;
-    line-height: 25px;
-}
-
-.quiz-box .question-text{
-    font-size: 22px;
-    color: #000000;
-    line-height: 26px;
-    font-weight: 400;
-    padding: 20px 0;
-    margin: 0;    
-}
+{% endblock %}
 
 
 
-
-.quiz-box .option-container .option{
-    background-color: #cccccc;
-    padding: 15px;
-    font-size: 16px;
-    line-height: 22px;
-    color: #000000;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    cursor: pointer;
-}
-
-.quiz-box .btn{
-    margin:15px 0;
-}
-
-</style>
-
-
+{% block myblock %}
 <div class="questionbox">
     <h6 style="text-align: center;margin-top: 10%;"> You have completed the test.</h6>
     <h3 style="text-align: center;margin-top: 1%;">  {{quiz.msg}}</h3>
@@ -156,11 +66,7 @@
 
 </form>
 
-
-
-
 {% endblock %}
-
 
 {% block scripts %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -170,7 +76,6 @@ const url = window.location.href
 var quizForm = document.getElementById('questions_form')
 var csrf = document.getElementsByName('csrfmiddlewaretoken')
 
-
 $(document).ready(function(){
 
     $(".boxform").css('display','none');
@@ -178,12 +83,10 @@ $(document).ready(function(){
     time_avail();
     questions();
     
-
 });
 
 
 function questions(){
-    
 
     var token = sessionStorage.getItem('Token')
     var subject = sessionStorage.getItem('subject')

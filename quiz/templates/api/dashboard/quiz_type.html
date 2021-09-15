@@ -1,9 +1,14 @@
 {% extends "dashboard/dashboard.html" %}
 {% load static %}
+
+
+
+{% block css_block %}
+<link rel="stylesheet" href="{% static 'css/type_style.css' %}" >
+{% enblock %}
+
 {% block myblock %}
 {% with object_list as subjects %}
-<link rel="stylesheet" href="{% static 'css/type_style.css' %}" >
-
 <h2>Welcome</h2>
 <form method="POST">
 {% csrf_token %}
@@ -25,6 +30,11 @@
         
     </div>
 </form>
+{% endwith %}
+
+{% endblock %}
+
+{% block scripts %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 
@@ -34,7 +44,6 @@ function show_start(){
 
 
 </script>
-{% endwith %}
 
 {% endblock %}
 

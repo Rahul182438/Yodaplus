@@ -9,11 +9,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.authtoken.models import Token
-
 from django.conf import settings
+
 from registration.models import VerificationStatus
 from registration.api.serializers import UserSignupSerializer,VerificationSerializer
-from registration.views import generate_otp
+from utils.tasks import generate_otp
 
 
 class UserCreateApi(APIView):

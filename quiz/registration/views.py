@@ -12,11 +12,12 @@ from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 
-import pyotp
 
 from .models import VerificationStatus
 from .forms import SignupForm, VerifyForm
 from .decorators import user_is_logged_in
+from utils.tasks import generate_otp
+
 
 class IndexView(TemplateView):
 
@@ -38,19 +39,17 @@ class RegistrationView(FormView):
     """    
     template_name = "registration/signup.html"
     form_class = SignupForm
-    # success_url = 'otp_verify'
 
-    """
-    Checks the form data submitted is valid
-    """
     def form_valid(self, form):
+        """
+        Checks the form data submitted is valid
+        """
         form.save()
         username = form.cleaned_data.get('username')
         email = form.cleaned_data.get('email')
         user_obj = User.objects.get(username=username,email=email)
         user_otp = generate_otp()
 
-        
         VerificationStatus.objects.create(user=user_obj,email_otp=user_otp)
         
         email_content = render_to_string('emails/verification_email.html', locals())
@@ -66,17 +65,15 @@ class RegistrationView(FormView):
         email.send()
         return redirect('registration:otp_verify',username=user_obj.username)
 
-
-
-
-
 @method_decorator(user_is_logged_in,name='dispatch')
 class LoginFormView(LoginView):
     
     template_name = "registration/login.html"
 
     def form_valid(self, form):
-
+        """
+        Retrieves the username and password and if it is available and otp is verified redirects to the dashboard
+        """
         username = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password')
         user = authenticate(self.request, username=username, password=password)
@@ -87,6 +84,9 @@ class LoginFormView(LoginView):
             verify_obj = None
         
         if verify_obj and verify_obj.email_verify == False:
+            """
+            If otp is not verified it redirects to the verification page
+            """
             return redirect('registration:otp_verify',username=user.username)
 
         elif user is not None and verify_obj:
@@ -94,7 +94,9 @@ class LoginFormView(LoginView):
             return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form):
-        print("#####")
+        """
+        If user details are incorrect throws a error message to enter a correct one.
+        """
         messages.info(self.request, 'Please enter a correct username and password')
         return super().form_invalid(form)
 
@@ -128,13 +130,3 @@ class VerifyView(FormView):
             messages.info(self.request, 'OTP is incorrect')
             return redirect('registration:otp_verify',user_id=user_obj.username)
                 
-
-def generate_otp():
-    """
-    A  OTP generate function.
-    OTP generated with PyOTP library with the current timestamp
-    """
-    totp = pyotp.TOTP('base32secret3232')
-    generate_otp  = totp.now()
-
-    return generate_otp

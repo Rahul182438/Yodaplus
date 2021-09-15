@@ -1,34 +1,46 @@
-from io import open_code
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from django.db.models.deletion import CASCADE
-from django.db.models.expressions import Case
-from django.db.models.fields.related import ForeignKey
 from django.utils.translation import ugettext_lazy as _
 
 
 class QuestionType(models.Model):
+
+    """
+    A table to store the type of questions available for each quiz
+    """
+
+    MCQ = 'MCQ'
+    ONE_LINE = 'One Line'
     quiz_choices = (
-        ('MCQ','Multiple Choice Questions'),
-        ('One Line','One Answer Questions'),
+        (MCQ,'Multiple Choice Questions'),
+        (ONE_LINE,'One Answer Questions'),
     )
     type_name = models.CharField(max_length=50, choices=quiz_choices)
 
     def __str__(self):
         return self.type_name
 
-
-
 class SubjectInfo(models.Model):
+    """
+    A table to store all the subjects its scoring points and level of ease available for the quiz
+    """
+
+    Subj_one = 'Maths'
+    Subj_two = 'GK'
+    
     subject_choices = (
-        ('Maths','Maths'),
-        ('GK','General Knowledge'),
+        (Subj_one,'Maths'),
+        (Subj_two,'General Knowledge'),
     )
+
+    level_1 = 'Easy'
+    level_2 = 'Medium'
+    level_3 = 'Hard'
+    
     level_choices = (
-        ('Easy','Easy'),
-        ('Medium','Medium'),
-        ('Hard','Hard'),
+        (level_1,'Easy'),
+        (level_2,'Medium'),
+        (level_3,'Hard'),
     )
 
     url_slug = models.SlugField(max_length=60, blank=False,unique=True)
@@ -43,6 +55,9 @@ class SubjectInfo(models.Model):
 
 
 class QuestionInfo(models.Model):
+    """
+    A table to store all the questions for the respective subjects
+    """
     type = models.ForeignKey(QuestionType, on_delete=models.CASCADE)
     subject = models.ForeignKey(SubjectInfo, on_delete=models.CASCADE)
     question = models.TextField(blank=True,null= True)
@@ -53,6 +68,9 @@ class QuestionInfo(models.Model):
     
 class AnswerInfo(models.Model):
     
+    """
+    A table to store all the mcq and one word answers
+    """
     question = models.ForeignKey(QuestionInfo, on_delete=models.CASCADE)
     answer = models.CharField(max_length=50, null=True, blank=True)
     is_correct = models.BooleanField(default=False)
@@ -64,6 +82,9 @@ class AnswerInfo(models.Model):
     
 
 class UserProgress(models.Model):
+    """
+    A table created for storing user's answers and time taken to complete respective questions
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subject = models.ForeignKey(SubjectInfo,on_delete=models.CASCADE)
     question = models.ForeignKey(QuestionInfo,on_delete=models.CASCADE)
@@ -74,61 +95,49 @@ class UserProgress(models.Model):
 
 
     def __str__(self):
-        
-        '''
-        Filter out the return type according to the user has answered the questions
-        '''
-        try:
-            answers_obj = AnswerInfo.objects.get(question=self.question,is_correct=True)
-        except:
-            answers_obj = None
-        
-
-        if self.mcq_answer == None and self.one_word_answer != "":
-            if answers_obj:
-                return str(self.question.question) +'\n Your Answer -> '+str(self.one_word_answer) + '\n Correct Answer -> ' + str(answers_obj.answer)
-        
-        
-        elif self.mcq_answer and self.mcq_answer.is_correct == True:
-            return str(self.question.question) +'\n Correct Answer -> '+str(self.mcq_answer)
-        
-        elif self.mcq_answer:
-            if answers_obj:
-                return str(self.question.question) +'\n Your Answer -> '+str(self.mcq_answer) + '\n Correct Answer -> ' + str(answers_obj.answer)
-        
+        if self.mcq_answer:
+            return str(self.question) + str(self.mcq_answer)
+        elif self.one_word_answer:
+            return str(self.question) + str(self.one_word_answer)
         else:
-            return str(self.question.question) +'\n You have not answered' + '\n Correct Answer -> ' + str(answers_obj.answer)
-        
+            return str(self.question)
+
+
     def report(self):
+        """
+        A method which checks the whether the  user answers are correct or incorrect.
+        Return a detail report on question's answered by user
+        """
         try:
             answers_obj = AnswerInfo.objects.get(question=self.question,is_correct=True)
         except:
             answers_obj = None
         
-        score = 0
+        
         is_correct = False
         
-
         if self.mcq_answer == None and self.one_word_answer != "":
             if answers_obj:
                 
-                return str(self.question.question) +'\n Your Answer -> '+str(self.one_word_answer) + '\n Correct Answer -> ' + str(answers_obj.answer), score,is_correct
+                return str(self.question.question) +'\n Your Answer -> '+str(self.one_word_answer) + '\n Correct Answer -> ' + str(answers_obj.answer),is_correct
                 
-        
-        
         elif self.mcq_answer and self.mcq_answer.is_correct == True:
-            score += self.question.max_score
+            
             is_correct  = True
-            return str(self.question.question) +'\n Correct Answer -> '+str(self.mcq_answer), score, is_correct
+            return str(self.question.question) +'\n Correct Answer -> '+str(self.mcq_answer), is_correct
         
         elif self.mcq_answer:
             if answers_obj:
-                return str(self.question.question) +'\n Your Answer -> '+str(self.mcq_answer) + '\n Correct Answer -> ' + str(answers_obj.answer), score, is_correct
+                return str(self.question.question) +'\n Your Answer -> '+str(self.mcq_answer) + '\n Correct Answer -> ' + str(answers_obj.answer), is_correct
         
         else:
-            return str(self.question.question) +'\n You have not answered' + '\n Correct Answer -> ' + str(answers_obj.answer), score, is_correct
+            return str(self.question.question) +'\n You have not answered' + '\n Correct Answer -> ' + str(answers_obj.answer), is_correct
 
+    
     def time_calc(self):
+        """
+        To calculate the total time used by user . - Used in API Section
+        """
         time_used = 0
         if self.time:
             time_used += self.time

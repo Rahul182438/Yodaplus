@@ -1,228 +1,126 @@
 {% extends "dashboard/dashboard.html" %}
 {% load static %}
 
-{% block myblock %}
-
+{% block css_block %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 
 <link rel="stylesheet" href="{% static 'css/questionbox.css' %}" >
 
-
-<style type="text/css">
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-.custom-box{
-    max-width: 700px;
-    background-color: #ffffff;
-    margin: 40px auto;
-    padding: 30px;
-    border-radius: 10px;
-}   
-
-.timer-box{
-    max-width: 97px;
-    background-color: #ffffff;
-    margin: 22px auto;
-    padding: 10px;
-    border-radius: 10px;
-}   
-.home-box h3{
-    font-size: 18px;
-    color: #000000;
-    font-weight: 500;
-    margin-bottom: 15px;
-    line-height: 25px;
-}
-
-.home-box p{
-    font-size: 16px;
-    margin-bottom: 10px;
-    line-height: 22px;
-    color: #000000;
-    font-weight: 400;
-}
-
-.home-box p span{
-    font-weight: 400;
-}
-
-.btn{
-    padding: 15px 45px;
-    background-color: #009688;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.quiz-box .question-number{
-    font-size: 18px;
-    color: #009688;
-    font-weight: 600;
-    border-bottom: 1px solid #cccccc;
-    padding-bottom: 10px;
-    line-height: 25px;
-}
-
-.quiz-box .question-text{
-    font-size: 22px;
-    color: #000000;
-    line-height: 26px;
-    font-weight: 400;
-    padding: 20px 0;
-    margin: 0;    
-}
-
-
-
-
-.quiz-box .option-container .option{
-    background-color: #cccccc;
-    padding: 15px;
-    font-size: 16px;
-    line-height: 22px;
-    color: #000000;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    cursor: pointer;
-}
-
-.quiz-box .btn{
-    margin:15px 0;
-}
-
-</style>
-
-{% if quiz.user_progress_obj and quiz.complete == True %}
-<div class="questionbox" >
-    <h6 style="text-align: center;margin-top: 10%;"> You have completed the test.</h6>
-    <h3 style="text-align: center;margin-top: 1%;">  {{quiz.msg}}</h3>
-    <div class="container" >
-        
-        
-        {% for user_answers in quiz.user_progress_obj %}
-            
-            
-                    {% if user_answers.mcq_answer %}
-                        
-                        <div class="col p-3 text-light h6 {% if user_answers.mcq_answer.is_correct == True %}bg-success{% else %}bg-danger{% endif %}" style="padding: 1%;line-height: 2.4;">
-                            {{user_answers|linebreaksbr}}
-                        </div>
-                    
-                        {% else %}
-                    
-                            <div class="col p-3 text-light h6 {% if user_answers.mcq_answer %}bg-success{% else %}bg-danger{% endif %}" style="padding: 1%;line-height: 2.4;">
-                                {{user_answers|linebreaksbr}}
-                            </div>
-                        {% endif %}
-          {% endfor %}
-          
-        
-      </div>
-</div>
-
-
-{% else %}
-
-<form method="POST" id="questions_form">
-{% csrf_token %}
-{% if quiz.questions_obj %}
-<div class="timer-box" style="margin-top: 5%;">
-<input type="hidden" id="current_time" value="">
-<div class="col text-right" id="timer-box" style="text-align: center;margin-right: 2%;"></div>
-
-</div>
-    {% for question in quiz.questions_obj %}
-
-    
-    <div class="quiz-box custom-box div-count{{forloop.counter}}"  style="display:{% if quiz.user_progress_obj %}none{% elif forloop.counter == 1 %} block {% else %} none {% endif %};">
-        
-            <div class="question-number">
-                Question {{forloop.counter|add:quiz.question_count}}
-            </div>
-            
-            
-            <input type="hidden"  class="interval" value="{{question.subject.interval}}">
-            <div class="question-text" >
-                {{question.question}}
-            </div>
-            {% if question.type.type_name == 'MCQ' %}
-
-                <div class="option-container" >
-                    {% for answer in quiz.answers_obj %}
-                        {% if answer.question == question  %}
-                            <div class="option">
-                                <input type="hidden" id="counter_value" value="{{forloop.parentloop.counter}}">
-                                <input type="hidden" id="final_counter" value="{{forloop.last}}">
-                                <input class="ans option-count{{forloop.parentloop.counter}}" type="radio" id="radio_{{answer.id}}" name="{{question.id}}" 
-                                value="{{answer.answer}}" {% if quiz.user_progress_obj %}{% for prog in quiz.user_progress_obj %}{% if prog.mcq_answer.id == answer.id %}checked{% endif %}{% endfor %}{% endif %}>
-                                {{answer.answer}}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-
-            {% else %}
-                <div class="option-container" >
-                    {% for answer in quiz.answers_obj %}
-                        {% if answer.question == question  %}
-                            <div class="option">
-                                <input type="hidden" id="counter_value" value="{{forloop.parentloop.counter}}">
-                                <input type="hidden" id="final_counter" value="{{forloop.last}}">
-                                Ans - <input type="text" class="ans option-count{{forloop.parentloop.counter}}" id="usr" name="{{question.id}}" value="{% for submit in quiz.user_progress_obj %}{% if submit.question.id == question.id %}{{submit.one_word_answer}}{% endif %}{% endfor %}">
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-
-            {% endif %}
-
-            <div class="next-question-button">
-                {% if forloop.last %}
-                    <input type="submit" class="btn"  value="Submit">
-                {% else %}
-                    <button type="button" class = "btn" onclick="next_div('{{forloop.counter}}','{{forloop.last}}')">Next</button>
-                {% endif %}
-
-            </div>
-    
-    </div>
-    {% endfor %}
-
-    {% else %}
-    <div class="quiz-box custom-box"  style="margin: 15% auto">
-        
-        <div class="question-number" style="text-align: center;">
-            No Questions Found
-        </div>
-        <div class="next-question-button" style="text-align: center;">
-            
-                <a href="{% url 'dashboard:user_dashboard' %}" type="button" class="btn" >Back</a>
-            
-
-        </div>        
-    </div>
-    
-
-    {% endif %}
-</form>
-
-
-{% endif %}
-
-
+<link rel="stylesheet" href="{% static 'css/questions.css' %}" >
 
 {% endblock %}
 
+
+{% block myblock %}
+
+{% if quiz.user_progress_obj and quiz.complete == True %}
+    <div class="questionbox" >
+        <h6 style="text-align: center;margin-top: 10%;"> You have completed the test.</h6>
+        <h3 style="text-align: center;margin-top: 1%;">  {{quiz.msg}}</h3>
+        <div class="container" >        
+            {% for user_answers in quiz.user_progress_obj %}
+                {% if user_answers.mcq_answer %}
+                    
+                    <div class="col p-3 text-light h6 {% if user_answers.mcq_answer.is_correct == True %}bg-success{% else %}bg-danger{% endif %}" style="padding: 1%;line-height: 2.4;">
+                        {{user_answers|linebreaksbr}}
+                    </div>
+                
+                    {% else %}
+                
+                        <div class="col p-3 text-light h6 {% if user_answers.mcq_answer %}bg-success{% else %}bg-danger{% endif %}" style="padding: 1%;line-height: 2.4;">
+                            {{user_answers|linebreaksbr}}
+                        </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+{% else %}
+    <form method="POST" id="questions_form">
+    {% csrf_token %}
+    {% if quiz.questions_obj %}
+        <div class="timer-box" style="margin-top: 5%;">
+        <input type="hidden" id="current_time" value="">
+        <div class="col text-right" id="timer-box" style="text-align: center;margin-right: 2%;"></div>
+
+        </div>
+        {% for question in quiz.questions_obj %}
+
+        
+        <div class="quiz-box custom-box div-count{{forloop.counter}}"  style="display:{% if quiz.user_progress_obj %}none{% elif forloop.counter == 1 %} block {% else %} none {% endif %};">
+            
+                <div class="question-number">
+                    Question {{forloop.counter|add:quiz.question_count}}
+                </div>
+                
+                
+                <input type="hidden"  class="interval" value="{{question.subject.interval}}">
+                <div class="question-text" >
+                    {{question.question}}
+                </div>
+                {% if question.type.type_name == 'MCQ' %}
+
+                    <div class="option-container" >
+                        {% for answer in quiz.answers_obj %}
+                            {% if answer.question == question  %}
+                                <div class="option">
+                                    <input type="hidden" id="counter_value" value="{{forloop.parentloop.counter}}">
+                                    <input type="hidden" id="final_counter" value="{{forloop.last}}">
+                                    <input class="ans option-count{{forloop.parentloop.counter}}" type="radio" id="radio_{{answer.id}}" name="{{question.id}}" 
+                                    value="{{answer.answer}}" {% if quiz.user_progress_obj %}{% for prog in quiz.user_progress_obj %}{% if prog.mcq_answer.id == answer.id %}checked{% endif %}{% endfor %}{% endif %}>
+                                    {{answer.answer}}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                {% else %}
+                    <div class="option-container" >
+                        {% for answer in quiz.answers_obj %}
+                            {% if answer.question == question  %}
+                                <div class="option">
+                                    <input type="hidden" id="counter_value" value="{{forloop.parentloop.counter}}">
+                                    <input type="hidden" id="final_counter" value="{{forloop.last}}">
+                                    Ans - <input type="text" class="ans option-count{{forloop.parentloop.counter}}" id="usr" name="{{question.id}}" value="{% for submit in quiz.user_progress_obj %}{% if submit.question.id == question.id %}{{submit.one_word_answer}}{% endif %}{% endfor %}">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                {% endif %}
+
+                <div class="next-question-button">
+                    {% if forloop.last %}
+                        <input type="submit" class="btn"  value="Submit">
+                    {% else %}
+                        <button type="button" class = "btn" onclick="next_div('{{forloop.counter}}','{{forloop.last}}')">Next</button>
+                    {% endif %}
+
+                </div>
+        
+        </div>
+        {% endfor %}
+
+        {% else %}
+        <div class="quiz-box custom-box"  style="margin: 15% auto">
+            
+            <div class="question-number" style="text-align: center;">
+                No Questions Found
+            </div>
+            <div class="next-question-button" style="text-align: center;">
+                
+                    <a href="{% url 'dashboard:user_dashboard' %}" type="button" class="btn" >Back</a>
+                
+
+            </div>        
+        </div>
+        
+
+        {% endif %}
+    </form>
+{% endif %}
+
+{% endblock %}
 
 {% block scripts %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>

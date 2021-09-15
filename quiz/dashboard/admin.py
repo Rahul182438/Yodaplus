@@ -8,26 +8,19 @@ from .models import QuestionType, SubjectInfo, QuestionInfo, AnswerInfo, UserPro
 admin.site.register(QuestionType)
 admin.site.register(SubjectInfo)
 
-
-"""
-    Custom Validations
-"""
-
-
 class AnswerForm(forms.ModelForm):
     """
         Custom Validations
     """
     def clean(self):
         answer = self.cleaned_data['answer']
-        if str(answer) == "None":
-            raise forms.ValidationError({'option': "Answer or Option Field Required."})
+        if answer is None :
+            raise forms.ValidationError({'answer': "Answer Field Required."})
 
 
 @admin.register(AnswerInfo)
 class AnswersAdmin(admin.ModelAdmin):
-    form = AnswerForm
-    
+    form = AnswerForm    
 
 class AnswerInline(admin.TabularInline):
     model = AnswerInfo
@@ -54,5 +47,3 @@ class UserProgressForm(forms.ModelForm):
 @admin.register(UserProgress)
 class UserProgressAdmin(admin.ModelAdmin):
     form = UserProgressForm
-    
-
